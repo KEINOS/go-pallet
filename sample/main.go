@@ -7,8 +7,10 @@ import (
 	"github.com/KEINOS/go-utiles/util"
 )
 
-var version string
-var commit string
+var (
+	version string
+	commit  string
+)
 
 func main() {
 	util.ExitOnErr(Run())
