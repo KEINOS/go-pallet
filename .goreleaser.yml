@@ -80,7 +80,7 @@ builds:
 # macOS universal binaries for both arm64 and amd64
 universal_binaries:
   -
-    name_template: 'go-pallet'
+    name_template: 'pallet'
     # Combine arm64 and amd64 as a single binary and remove each
     replace: true
 

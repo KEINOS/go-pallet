@@ -26,5 +26,9 @@ func Run() error {
 
 // GetVersion returns the current app version.
 func GetVersion() string {
-	return strings.TrimSpace(fmt.Sprintf("%s %s", version, commit))
+	if commit != "" {
+		commit = "-" + commit
+	}
+
+	return strings.TrimSpace(fmt.Sprintf("%s%s", version, commit))
 }
