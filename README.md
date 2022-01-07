@@ -4,7 +4,7 @@
 
 # go-pallet<sub><sup><sup>beta</sup></sup></sub>
 
-`go-pallet` package is a library that simply returns the number of colors used in an image.
+The `go-pallet` package is a Go library that simply gets the number of colors used in an image. For color pallet and/or histogram-base usage.
 
 ## Library Usage
 
