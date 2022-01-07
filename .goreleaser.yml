@@ -45,7 +45,7 @@ snapshot:
 builds:
   -
     # Target directory of main.go
-    main: ./sample
+    main: ./cmd
     # Output binary name
     binary: pallet
     env:
