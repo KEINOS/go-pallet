@@ -16,8 +16,8 @@ go get "github.com/KEINOS/go-pallet"
 
 ```go
 /*
-This sample yields a color palette with RGBA color combinations
-and their number of occurrences as values.
+  This sample yields a color palette with RGBA color combinations
+  and their number of occurrences as values.
 */
 
 // import "github.com/KEINOS/go-pallet/pallet"
@@ -43,9 +43,9 @@ fmt.Println(pixInfoList[0:2])
 
 ```go
 /*
-This sample yields a histogram of an image which is a color palette
-with each channel's shade level (0-255) as a key and their number
-of occurrences as values.
+  This sample yields a histogram of an image which is a color palette
+  with each channel's shade level (0-255) as a key and their number
+  of occurrences as values.
 */
 
 // import "github.com/KEINOS/go-pallet/pallet"
