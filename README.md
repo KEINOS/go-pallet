@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 [![go1.16+](https://img.shields.io/badge/Go-1.16+-blue?logo=go)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
-[![Go Reference](https://pkg.go.dev/badge/github.com/KEINOS/go-pallet.svg)](https://pkg.go.dev/github.com/KEINOS/go-pallet)
+[![Go Reference](https://pkg.go.dev/badge/github.com/KEINOS/go-pallet.svg)](https://pkg.go.dev/github.com/KEINOS/go-pallet/pallet)
 
 # go-pallet<sub><sup><sup>beta</sup></sup></sub>
 
