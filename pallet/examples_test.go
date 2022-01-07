@@ -54,17 +54,17 @@ func ExampleByOccurrence() {
 
 func ExamplePixInfo_GetKey() {
 	pixInfo := pallet.PixInfo{
-		R: 12, // Red --> 012
+		R: 12, // Red   --> 012
 		G: 34, // Green --> 034
-		B: 56, // Blue --> 056
-		A: 0,  // Alpha --> 255
+		B: 56, // Blue  --> 056
+		A: 0,  // Alpha --> 000
 	}
 
 	key := pixInfo.GetKey()
 
+	// Note that each RGBA values are filled with zero
 	fmt.Println(key)
 
-	// Note that each RGBA values are filled with zero
 	// Output: 012034056000
 }
 
