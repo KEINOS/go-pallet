@@ -15,6 +15,11 @@ go get "github.com/KEINOS/go-pallet"
 - Basic Usage
 
 ```go
+/*
+This sample yields a color palette with RGBA color combinations
+and their number of occurrences as values.
+*/
+
 // import "github.com/KEINOS/go-pallet/pallet"
 
 // Load image
@@ -27,7 +32,9 @@ if err != nil {
 // Returned data are sorted in order of frequency of use.
 pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-// Print the first 2 most used colors
+// Print the first 2 most used colors. Which is:
+//   46618 pixcels of RGBA(0,0,0,0) and
+//   32505 pixcels of RGBA(208,182,152,255)
 fmt.Println(pixInfoList[0:2])
 
 // Output:
@@ -35,6 +42,12 @@ fmt.Println(pixInfoList[0:2])
 ```
 
 ```go
+/*
+This sample yields a histogram of an image which is a color palette
+with each channel's shade level (0-255) as a key and their number
+of occurrences as values.
+*/
+
 // import "github.com/KEINOS/go-pallet/pallet"
 
 // Load image
@@ -48,8 +61,8 @@ hist := pallet.AsHistogram(imgRGBA)
 
 // Print the occurrences of each color channel's shade level.
 //   <channel>[<shade level>] = <occurrence>
-// If a red pixel with max-opacity (R,G,B,A=255,0,0,255) appeared twice in
-// an image then it will be:
+// For example if a red pixel with max-opacity (R,G,B,A=255,0,0,255)
+// appeared twice in an image then it will be:
 //   r[255]=2, g[0]=2, b[0]=2, a[255]=2
 fmt.Printf("r[0]=%v, r[255]=%v\n", hist.R[0], hist.R[255])
 fmt.Printf("g[0]=%v, g[255]=%v\n", hist.G[0], hist.G[255])
@@ -65,7 +78,7 @@ fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
 
 ## Command Usage
 
-Here's a simple implementation of `go-pallet` as a CLI app.
+Here's a [simple implementation](./cmd/main.go) of `go-pallet` as a CLI app.
 
 ## Install
 
