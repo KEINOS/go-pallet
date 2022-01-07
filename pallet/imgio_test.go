@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/KEINOS/go-pallet/pallet"
+	"github.com/KEINOS/go-utiles/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -77,7 +78,9 @@ func TestEncode(t *testing.T) {
 }
 
 func TestOpen_fail(t *testing.T) {
-	pathDirTmp := t.TempDir()
+	// util.GetTempDir is similar to t.TempDir() but for compatibility with Go 1.14
+	pathDirTmp, cleanup := util.GetTempDir()
+	defer cleanup()
 
 	// Un-existing path
 	{
@@ -115,7 +118,9 @@ func TestOpen_saved_image(t *testing.T) {
 	}
 
 	// Save
-	pathDirTmp := t.TempDir()
+	pathDirTmp, cleanup := util.GetTempDir()
+	defer cleanup()
+
 	pathFileTmp := filepath.Join(pathDirTmp, "temp.png")
 
 	err := pallet.Save(pathFileTmp, imgRAW, encPNG)
@@ -158,10 +163,12 @@ func TestSave_fail_save(t *testing.T) {
 	}
 
 	// Save
-	pathDirTmp := t.TempDir()
+	pathDirTmp, cleanup := util.GetTempDir()
+	defer cleanup()
+
 	err := pallet.Save(pathDirTmp, imgRAW, encPNG)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "open /tmp/TestSave_fail_save")
+	assert.Contains(t, err.Error(), "open "+pathDirTmp)
 	assert.Contains(t, err.Error(), "is a directory")
 }

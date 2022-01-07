@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD041 -->
-[![go1.14+](https://img.shields.io/badge/Go-1.14~17-blue?logo=go)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
+[![go1.16+](https://img.shields.io/badge/Go-1.16+-blue?logo=go)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
 [![Go Reference](https://pkg.go.dev/badge/github.com/KEINOS/go-pallet.svg)](https://pkg.go.dev/github.com/KEINOS/go-pallet)
 
-# go-pallet<sub><sup><sup>alpha</sup></sup></sub>
+# go-pallet<sub><sup><sup>beta</sup></sup></sub>
 
 `go-pallet` package is a library that simply returns the number of colors used in an image.
 
@@ -20,23 +20,47 @@ go get "github.com/KEINOS/go-pallet"
 // Load image
 imgRGBA, err := pallet.Load("/path/to/image/sample.png")
 if err != nil {
-    return err
+  log.Fatal(err)
 }
 
-// Get list of RGBA combination and thouse number of occurance.
-// The elements are sorted by its number of occurances.
-pixList := pallet.ByOccurrence(imgRGBA)
+// Get all the color combinations used in an image.
+// Returned data are sorted in order of frequency of use.
+pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-// Print used color (RGBA combination) and its occurance.
-fmt.Println(util.FmtStructPretty(pixList))
+// Print the first 2 most used colors
+fmt.Println(pixInfoList[0:2])
 
 // Output:
-// [
-//   {"R": 178, "G": 156, "B": 130, "A": 255, "Count": 13},
-//   {"R": 15, "G": 13, "B": 11, "A": 255, "Count": 12},
-//   {"R": 4, "G": 4, "B": 3, "A": 255, "Count": 11},
-//   ** snip **
-// ]
+// [{0 0 0 0 46618} {208 182 152 255 32505}]
+```
+
+```go
+// import "github.com/KEINOS/go-pallet/pallet"
+
+// Load image
+imgRGBA, err := pallet.Load("/path/to/image/sample.png")
+if err != nil {
+  log.Fatal(err)
+}
+
+// Get the image histogram.
+hist := pallet.AsHistogram(imgRGBA)
+
+// Print the occurrences of each color channel's shade level.
+//   <channel>[<shade level>] = <occurrence>
+// If a red pixel with max-opacity (R,G,B,A=255,0,0,255) appeared twice in
+// an image then it will be:
+//   r[255]=2, g[0]=2, b[0]=2, a[255]=2
+fmt.Printf("r[0]=%v, r[255]=%v\n", hist.R[0], hist.R[255])
+fmt.Printf("g[0]=%v, g[255]=%v\n", hist.G[0], hist.G[255])
+fmt.Printf("b[0]=%v, b[255]=%v\n", hist.B[0], hist.B[255])
+fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
+
+// Output:
+// r[0]=3, r[255]=1
+// g[0]=3, g[255]=1
+// b[0]=3, b[255]=1
+// a[0]=1, a[255]=3
 ```
 
 ## Command Usage
@@ -58,12 +82,31 @@ brew install KEINOS/apps/go-pallet
 ### Usage
 
 ```shellsession
-$ pallet ./path/to/image/sample.png
+$ pallet -h
+pallet
+  Simply print-outs the number of colors used or the histogram of an image in JSON.
+
+Usage:
+  main [options] <file path>
+
+Options:
+
+  -f, --file        file path of an image to analyze
+      --histogram   print the histogram of the given image in JSON
+  -p, --perline     prints each JSON elements per line
+  -v, --version     displays app version
+  -h, --help        display help information
+```
+```shellsession
+$ pallet /path/to/image/sample.png
+[{"r":255,"g":0,"b":0,"a":255,"count":1},{"r":0,"g":0,"b":255,"a":255,"count":1},{"r":0,"g":255,"b":0,"a":255,"count":1},{"r":0,"g":0,"b":0,"a":0,"count":1}]
+
+$ pallet /path/to/image/sample.png --perline
 [
-  {"R": 178, "G": 156, "B": 130, "A": 255, "Count": 13},
-  {"R": 15, "G": 13, "B": 11, "A": 255, "Count": 12},
-  {"R": 4, "G": 4, "B": 3, "A": 255, "Count": 11},
-  ** snip **
+{"r":255,"g":0,"b":0,"a":255,"count":1},
+{"r":0,"g":0,"b":255,"a":255,"count":1},
+{"r":0,"g":255,"b":0,"a":255,"count":1},
+{"r":0,"g":0,"b":0,"a":0,"count":1}
 ]
 ```
 
@@ -73,15 +116,13 @@ $ pallet ./path/to/image/sample.png
 
 This template adopts the below security measures to start with.
 
-[![go1.14+](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Unit tests")
+[![go1.16+](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Unit tests")
 [![golangci-lint](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml "Static Analysis")
 [![codecov](https://codecov.io/gh/KEINOS/go-pallet/branch/main/graph/badge.svg?token=uW30s2bK8M)](https://codecov.io/gh/KEINOS/go-pallet "Code Coverage")
 [![Go Report Card](https://goreportcard.com/badge/github.com/KEINOS/go-pallet)](https://goreportcard.com/report/github.com/KEINOS/go-pallet "Code Quality")
 [![CodeQL](https://github.com/KEINOS/go-pallet/actions/workflows/codeQL-analysis.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/codeQL-analysis.yml "Vulnerability Scan")
 
 ---
-
-<!-- You can use any license to use this template -->
 
 ## License
 
