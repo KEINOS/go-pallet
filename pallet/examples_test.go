@@ -52,6 +52,36 @@ func ExampleByOccurrence() {
 	// [{0 0 0 0 46618} {208 182 152 255 32505}]
 }
 
+func ExampleDiff() {
+	// Get image1 (3x3pix)
+	pathFileImg1 := "../testdata/rgbacmykw.png"
+
+	imgRGBA1, err := pallet.Load(pathFileImg1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Get image2 (3x3pix)
+	pathFileImg2 := "../testdata/rgbacmykw.png"
+
+	imgRGBA2, err := pallet.Load(pathFileImg2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Get the absolute diff between two images
+	imgDiff, err := pallet.Diff(imgRGBA1, imgRGBA2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// It should be all zero since it's the same image
+	fmt.Printf("%v", imgDiff.Pix)
+
+	// Output:
+	// [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+}
+
 func ExamplePixInfo_GetKey() {
 	pixInfo := pallet.PixInfo{
 		R: 12, // Red   --> 012
