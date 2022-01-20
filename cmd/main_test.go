@@ -152,7 +152,7 @@ func Test_main_file_not_found(t *testing.T) {
 	})
 
 	require.Equal(t, 1, capturedCode, "exit status should be 1 on error")
-	assert.Contains(t, out, "failed to load image: open unknown path")
+	assert.Contains(t, out, "failed to load image")
 }
 
 func Test_main_no_args(t *testing.T) {
