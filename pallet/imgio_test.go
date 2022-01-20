@@ -100,7 +100,7 @@ func TestOpen_fail(t *testing.T) {
 
 		_, err = pallet.Open(pathFileTmp)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "image: unknown format")
+		assert.Contains(t, err.Error(), "failed to decode image file")
 	}
 }
 

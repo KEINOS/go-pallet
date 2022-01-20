@@ -34,6 +34,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/pkg/errors"
 	"golang.org/x/image/bmp"
 )
 
@@ -50,13 +51,13 @@ type Encoder func(io.Writer, image.Image) error
 func Open(filename string) (image.Image, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "no such file or directory")
 	}
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to decode image file")
 	}
 
 	return img, nil
