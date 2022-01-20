@@ -8,7 +8,7 @@ FROM ghcr.io/keinos/vscode-dev-container-go:${VARIANT}
 
 # [Optional] Uncomment this section to install additional OS packages.
 # USER root
-# RUN apk add --no-cache <your-package-list-here>
+# RUN apk add --no-cache <your-package-here>
 
 # [Optional] Uncomment this section to go install anything else you need.
 # USER vscode

@@ -152,7 +152,7 @@ func Test_main_file_not_found(t *testing.T) {
 	})
 
 	require.Equal(t, 1, capturedCode, "exit status should be 1 on error")
-	assert.Contains(t, out, "failed to load image: open unknown path")
+	assert.Contains(t, out, "failed to load image")
 }
 
 func Test_main_no_args(t *testing.T) {
@@ -203,7 +203,8 @@ func Test_main_show_version(t *testing.T) {
 	})
 
 	require.Equal(t, 0, capturedCode, "exit status should be zero on version display")
-	assert.Contains(t, out, "cmd.test (devel)")
+	assert.Contains(t, out, "cmd.test")
+	assert.Contains(t, out, "(devel)")
 }
 
 func TestGetVersion(t *testing.T) {
@@ -216,11 +217,14 @@ func TestGetVersion(t *testing.T) {
 		commit = oldCommitID
 	}()
 
+	// Mock version
 	version = "1.2.3"
 	commit = "abc"
 
-	expect := "cmd.test 1.2.3 (abc)"
+	// Get
 	actual := GetVersion()
 
-	assert.Equal(t, expect, actual)
+	// Assert
+	assert.Contains(t, actual, "cmd.test")
+	assert.Contains(t, actual, "1.2.3 (abc)")
 }
