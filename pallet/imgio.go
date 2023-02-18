@@ -44,18 +44,18 @@ type Encoder func(io.Writer, image.Image) error
 // Open loads and decodes an image from a file and returns it.
 //
 // Usage example:
-//		// Decodes an image from a file with the given filename
-//		// returns an error if something went wrong
-//		img, err := Open("exampleName")
 //
+//	// Decodes an image from a file with the given filename
+//	// returns an error if something went wrong
+//	img, err := Open("exampleName")
 func Open(filename string) (image.Image, error) {
-	f, err := os.Open(filename)
+	ptrFile, err := os.Open(filename)
 	if err != nil {
 		return nil, errors.Wrap(err, "no such file or directory")
 	}
-	defer f.Close()
+	defer ptrFile.Close()
 
-	img, _, err := image.Decode(f)
+	img, _, err := image.Decode(ptrFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode image file")
 	}
@@ -66,39 +66,42 @@ func Open(filename string) (image.Image, error) {
 // JPEGEncoder returns an encoder to JPEG given the argument 'quality'.
 func JPEGEncoder(quality int) Encoder {
 	return func(w io.Writer, img image.Image) error {
-		return jpeg.Encode(w, img, &jpeg.Options{Quality: quality})
+		return errors.Wrap(jpeg.Encode(w, img, &jpeg.Options{Quality: quality}),
+			"failed to encode image to JPEG")
 	}
 }
 
 // PNGEncoder returns an encoder to PNG.
 func PNGEncoder() Encoder {
 	return func(w io.Writer, img image.Image) error {
-		return png.Encode(w, img)
+		return errors.Wrap(png.Encode(w, img),
+			"failed to encode image to PNG")
 	}
 }
 
 // BMPEncoder returns an encoder to BMP.
 func BMPEncoder() Encoder {
 	return func(w io.Writer, img image.Image) error {
-		return bmp.Encode(w, img)
+		return errors.Wrap(bmp.Encode(w, img),
+			"failed to encode image to BMP")
 	}
 }
 
 // Save creates a file and writes to it an image using the provided encoder.
 //
 // Usage example:
-//		// Save an image to a file in PNG format,
-//		// returns an error if something went wrong
-//		err := Save("exampleName", img, imgio.JPEGEncoder(100))
 //
+//	// Save an image to a file in PNG format,
+//	// returns an error if something went wrong
+//	err := Save("exampleName", img, imgio.JPEGEncoder(100))
 func Save(filename string, img image.Image, encoder Encoder) error {
 	// filename = strings.TrimSuffix(filename, filepath.Ext(filename))
-	f, err := os.Create(filename)
+	ptrFile, err := os.Create(filename)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to create file to save")
 	}
 
-	defer f.Close()
+	defer ptrFile.Close()
 
-	return encoder(f, img)
+	return encoder(ptrFile, img)
 }

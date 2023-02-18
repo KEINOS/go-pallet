@@ -9,7 +9,7 @@ import (
 
 func ExampleAsHistogram() {
 	// 2x2 pixel image with each RGBA color of 1-pixel
-	pathFile := "../testdata/r1g1b1a1.png"
+	const pathFile = "../testdata/r1g1b1a1.png"
 
 	imgRGBA, err := pallet.Load(pathFile)
 	if err != nil {
@@ -36,7 +36,7 @@ func ExampleAsHistogram() {
 }
 
 func ExampleByOccurrence() {
-	pathFile := "../testdata/gopher.png"
+	const pathFile = "../testdata/gopher.png"
 
 	imgRGBA, err := pallet.Load(pathFile)
 	if err != nil {
@@ -54,7 +54,7 @@ func ExampleByOccurrence() {
 
 func ExampleDiff() {
 	// Get image1 (3x3pix)
-	pathFileImg1 := "../testdata/rgbacmykw.png"
+	const pathFileImg1 = "../testdata/rgbacmykw.png"
 
 	imgRGBA1, err := pallet.Load(pathFileImg1)
 	if err != nil {
@@ -62,7 +62,7 @@ func ExampleDiff() {
 	}
 
 	// Get image2 (3x3pix)
-	pathFileImg2 := "../testdata/rgbacmykw.png"
+	const pathFileImg2 = "../testdata/rgbacmykw.png"
 
 	imgRGBA2, err := pallet.Load(pathFileImg2)
 	if err != nil {
@@ -84,22 +84,23 @@ func ExampleDiff() {
 
 func ExamplePixInfo_GetKey() {
 	pixInfo := pallet.PixInfo{
-		R: 12, // Red   --> 012
-		G: 34, // Green --> 034
-		B: 56, // Blue  --> 056
-		A: 0,  // Alpha --> 000
+		R:     12, // Red   --> 012
+		G:     34, // Green --> 034
+		B:     56, // Blue  --> 056
+		A:     0,  // Alpha --> 000
+		Count: 0,  // Not used
 	}
 
 	key := pixInfo.GetKey()
 
-	// Note that each RGBA values are filled with zero
+	// Print the RGBA values in RRRGGGBBBAAA format. Note that each RGBA values are filled with zero
 	fmt.Println(key)
 
 	// Output: 012034056000
 }
 
 func ExamplePixInfoList_InJSON_element_per_line() {
-	pathFileImg := "../testdata/r1g2b4a2.png"
+	const pathFileImg = "../testdata/r1g2b4a2.png"
 
 	// Load image
 	imgRGBA, err := pallet.Load(pathFileImg)
@@ -131,7 +132,7 @@ func ExamplePixInfoList_InJSON_element_per_line() {
 }
 
 func ExamplePixInfoList_InJSON_single_line() {
-	pathFileImg := "../testdata/r1g2b4a2.png"
+	const pathFileImg = "../testdata/r1g2b4a2.png"
 
 	// Load image
 	imgRGBA, err := pallet.Load(pathFileImg)

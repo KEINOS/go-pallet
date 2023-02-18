@@ -20,7 +20,7 @@ type PixKey string
 
 // GetAlpha returns the alpha value from the RRRGGGBBBAAA format key string.
 //
-//   a := GetAlpha("255255255100") // --> 100
+//	a := GetAlpha("255255255100") // --> 100
 func (k PixKey) GetAlpha() int {
 	i, _ := strconv.Atoi(string(k)[9:12])
 
@@ -29,7 +29,7 @@ func (k PixKey) GetAlpha() int {
 
 // GetBlue returns the blue value from the RRRGGGBBBAAA format key string.
 //
-//   a := GetBlue("255255100255") // --> 100
+//	a := GetBlue("255255100255") // --> 100
 func (k PixKey) GetBlue() int {
 	i, _ := strconv.Atoi(string(k)[6:9])
 
@@ -38,7 +38,7 @@ func (k PixKey) GetBlue() int {
 
 // GetGreen returns the green value from the RRRGGGBBBAAA format key string.
 //
-//   a := GetGreen("255100255255") // --> 100
+//	a := GetGreen("255100255255") // --> 100
 func (k PixKey) GetGreen() int {
 	i, _ := strconv.Atoi(string(k)[3:6])
 
@@ -47,7 +47,7 @@ func (k PixKey) GetGreen() int {
 
 // GetRed returns the red value from the RRRGGGBBBAAA format key string.
 //
-//   a := GetRed("100255255255") // --> 100
+//	a := GetRed("100255255255") // --> 100
 func (k PixKey) GetRed() int {
 	i, _ := strconv.Atoi(string(k)[0:3])
 

@@ -1,15 +1,17 @@
 package pallet_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/KEINOS/go-pallet/pallet"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestAsHistogram(t *testing.T) {
+	t.Parallel()
+
 	for _, test := range []struct {
 		path   string
 		expect []int
@@ -44,6 +46,8 @@ func TestAsHistogram(t *testing.T) {
 }
 
 func TestAsHistogram_InJSON_defalt(t *testing.T) {
+	t.Parallel()
+
 	// 2x2 pixel image with each RGBA color of 1-pixel
 	imgRGBA, err := pallet.Load("../testdata/r1g1b1a1.png")
 	require.NoError(t, err)
@@ -97,6 +101,8 @@ func TestAsHistogram_InJSON_defalt(t *testing.T) {
 }
 
 func TestAsHistogram_InJSON_perline(t *testing.T) {
+	t.Parallel()
+
 	// 2x2 pixel image with each RGBA color of 1-pixel
 	imgRGBA, err := pallet.Load("../testdata/r1g1b1a1.png")
 	require.NoError(t, err)
@@ -114,6 +120,7 @@ func TestAsHistogram_InJSON_perline(t *testing.T) {
 	assert.Contains(t, actualJSON, " 3\n  ]\n}")
 }
 
+//nolint:paralleltest // Do not parallelize due to global state change
 func TestAsHistogram_InJSON_default_fail(t *testing.T) {
 	// Backup and defer restore
 	oldJSONMarshal := pallet.JSONMarshal
@@ -139,6 +146,7 @@ func TestAsHistogram_InJSON_default_fail(t *testing.T) {
 	assert.Contains(t, err.Error(), "JSON conversion failed")
 }
 
+//nolint:paralleltest // Do not parallelize due to global state change
 func TestAsHistogram_InJSON_perline_fail(t *testing.T) {
 	// Backup and defer restore
 	oldJSONMarshalIndent := pallet.JSONMarshalIndent
@@ -165,11 +173,14 @@ func TestAsHistogram_InJSON_perline_fail(t *testing.T) {
 }
 
 func TestGetKey(t *testing.T) {
+	t.Parallel()
+
 	pixInfo := pallet.PixInfo{
-		R: 12, // Red --> 012
-		G: 34, // Green --> 034
-		B: 56, // Blue --> 056
-		A: 0,  // Alpha --> 255
+		R:     12, // Red --> 012
+		G:     34, // Green --> 034
+		B:     56, // Blue --> 056
+		A:     0,  // Alpha --> 255
+		Count: 0,
 	}
 
 	key := pixInfo.GetKey()
@@ -178,6 +189,8 @@ func TestGetKey(t *testing.T) {
 }
 
 func TestLoad(t *testing.T) {
+	t.Parallel()
+
 	pathFile := t.TempDir()
 
 	_, err := pallet.Load(pathFile)
@@ -185,6 +198,7 @@ func TestLoad(t *testing.T) {
 	require.Error(t, err)
 }
 
+//nolint:paralleltest // Do not parallelize due to global state change
 func TestPixInfoList_InJSON(t *testing.T) {
 	pathFileImg := "../testdata/r1g2b4a2.png"
 

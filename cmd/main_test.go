@@ -1,3 +1,4 @@
+//nolint:paralleltest // Do not parallelize due to the global variable change during the test.
 package main
 
 import (

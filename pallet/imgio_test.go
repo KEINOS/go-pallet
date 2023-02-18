@@ -5,7 +5,6 @@ import (
 	"image"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/KEINOS/go-pallet/pallet"
@@ -15,7 +14,9 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	cases := []struct {
+	t.Parallel()
+
+	tests := []struct {
 		value   image.Image
 		encoder pallet.Encoder
 		format  string
@@ -61,23 +62,21 @@ func TestEncode(t *testing.T) {
 		},
 	}
 
-	for _, c := range cases {
+	for _, test := range tests {
 		buf := bytes.Buffer{}
-		err := c.encoder(&buf, c.value)
+		err := test.encoder(&buf, test.value)
 		require.NoError(t, err)
 
 		_, outFormat, err := image.Decode(&buf)
-		if err != nil {
-			t.Error(err)
-		}
+		require.NoError(t, err)
 
-		if !strings.Contains(c.format, outFormat) {
-			t.Errorf("%s: expected: %#v, actual: %#v", "Encoder", c.format, outFormat)
-		}
+		assert.Contains(t, test.format, outFormat)
 	}
 }
 
 func TestOpen_fail(t *testing.T) {
+	t.Parallel()
+
 	// util.GetTempDir is similar to t.TempDir() but for compatibility with Go 1.14
 	pathDirTmp, cleanup := util.GetTempDir()
 	defer cleanup()
@@ -105,6 +104,8 @@ func TestOpen_fail(t *testing.T) {
 }
 
 func TestOpen_saved_image(t *testing.T) {
+	t.Parallel()
+
 	// Create image
 	encPNG := pallet.PNGEncoder()
 	imgRAW := &image.RGBA{
@@ -150,6 +151,8 @@ func TestOpen_saved_image(t *testing.T) {
 }
 
 func TestSave_fail_save(t *testing.T) {
+	t.Parallel()
+
 	// Create image
 	encPNG := pallet.PNGEncoder()
 	imgRAW := &image.RGBA{
@@ -169,6 +172,6 @@ func TestSave_fail_save(t *testing.T) {
 	err := pallet.Save(pathDirTmp, imgRAW, encPNG)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "open "+pathDirTmp)
-	assert.Contains(t, err.Error(), "is a directory")
+	assert.Contains(t, err.Error(), "failed to create file to save",
+		"it should contain the error reason")
 }

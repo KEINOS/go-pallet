@@ -42,12 +42,20 @@ func (p PixInfoList) inJSONSingleLine() (string, error) {
 	return string(b), nil
 }
 
+// inJSONPerLine is a JSON marshaler but in a special format.
+//
+//	[
+//	{"r":255,"g":0,"b":0,"a":255,"count":1},
+//	{"r":0,"g":0,"b":255,"a":255,"count":1},
+//	{"r":0,"g":255,"b":0,"a":255,"count":1},
+//	{"r":0,"g":0,"b":0,"a":0,"count":1}
+//	]
 func (p PixInfoList) inJSONPerLine() (string, error) {
 	result := "[\n"
 	lenList := len(p)
 
-	for i := 0; i < lenList; i++ {
-		a := p[i]
+	for index := 0; index < lenList; index++ {
+		a := p[index]
 
 		byteData, err := JSONMarshal(a)
 		if err != nil {
@@ -55,7 +63,7 @@ func (p PixInfoList) inJSONPerLine() (string, error) {
 		}
 
 		result += string(byteData)
-		if i != (lenList - 1) {
+		if index != (lenList - 1) {
 			result += ","
 		}
 

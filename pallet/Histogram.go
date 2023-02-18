@@ -41,12 +41,12 @@ func NewHistogram() *Histogram {
 
 // InJSON returns the histogram of the image in JSON string.
 //
-//   {
-//     "r": [...],
-//     "g": [...],
-//     "g": [...],
-//     "a": [...],
-//   }
+//	{
+//	  "r": [...],
+//	  "g": [...],
+//	  "g": [...],
+//	  "a": [...],
+//	}
 //
 // Each channel contains a matrix consisting of 256 elements. The index of the
 // matrix represents the shadow level, and the value represents the number of

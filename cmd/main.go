@@ -73,7 +73,7 @@ func PreRun(ctx *cli.Context) error {
 
 // Run is the actual function of the app. It will print the color combination
 // used or the histogram of an image.
-func Run(pathFile string, asHistogram bool, printPerLine bool) (result string, err error) {
+func Run(pathFile string, asHistogram bool, printPerLine bool) (string, error) {
 	imgRGBA, err := pallet.Load(pathFile)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to load image")
@@ -81,13 +81,15 @@ func Run(pathFile string, asHistogram bool, printPerLine bool) (result string, e
 
 	if asHistogram {
 		pl := pallet.AsHistogram(imgRGBA)
+		result, err := pl.InJSON(printPerLine)
 
-		return pl.InJSON(printPerLine)
+		return result, errors.Wrap(err, "failed to format the histogram pallet to JSON (main.Run())")
 	}
 
 	pl := pallet.ByOccurrence(imgRGBA)
+	result, err := pl.InJSON(printPerLine)
 
-	return pl.InJSON(printPerLine)
+	return result, errors.Wrap(err, "failed to format the occurrence pallet to JSON (main.Run())")
 }
 
 // GetVersion returns the app version to display.

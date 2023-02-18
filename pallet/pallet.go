@@ -37,6 +37,7 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			//nolint:varnamelen // Allow short variable name for readability
 			r, g, b, a := imgRGBA.At(x, y).RGBA()
 
 			// Count up the corresponding shade strength of each channel

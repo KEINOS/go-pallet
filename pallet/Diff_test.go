@@ -13,6 +13,8 @@ import (
 )
 
 func TestDiff_size_unmatch(t *testing.T) {
+	t.Parallel()
+
 	img1 := image.NewRGBA(image.Rect(0, 0, 3, 3))
 	img2 := image.NewRGBA(image.Rect(0, 0, 5, 5))
 
@@ -23,6 +25,8 @@ func TestDiff_size_unmatch(t *testing.T) {
 }
 
 func TestDiff_change_each_rgb(t *testing.T) {
+	t.Parallel()
+
 	img1 := image.NewRGBA(image.Rect(0, 0, 3, 3))
 	img2 := image.NewRGBA(image.Rect(0, 0, 3, 3))
 
@@ -79,12 +83,14 @@ func TestDiff_change_each_rgb(t *testing.T) {
 // GetRandColorRGBA returns a color.RGBA object and a random value.
 // The color object has a random value for one of the RGBA channels defined by
 // the argument. Other channels are set to zero.
+//
+//nolint:nonamedreturns // Allow named return values for readability.
 func GetRandColorRGBA(t *testing.T, indexRGBA int) (pix color.RGBA, diff uint8) {
 	t.Helper()
 
-	rand.Seed(time.Now().UnixNano())
 	//nolint:gosec // In this case, it is sufficient to use the pseudorandom for testing.
-	diffInt := uint8(rand.Intn(256)) // rand 0-256
+	randGen := rand.New(rand.NewSource(time.Now().UnixNano()))
+	diffInt := uint8(randGen.Intn(256)) // rand 0-256
 
 	switch indexRGBA {
 	case 0: // R
