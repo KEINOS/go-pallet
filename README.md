@@ -88,6 +88,12 @@ Here's a [simple implementation](./cmd/main.go) of `go-pallet` as a CLI app.
 brew install KEINOS/apps/go-pallet
 ```
 
+- Via Go install (all platforms)
+
+```bash
+go install "github.com/KEINOS/go-pallet/cmd/pallet@latest"
+```
+
 - Manual Install
     - [releases page](https://github.com/KEINOS/go-pallet/releases/latest)
     - macOS (Intel/AMD64/M1), Windows (AMD64/Intel), Linux (Intel/AMD64, Arm 5,6,7, Arm64)
