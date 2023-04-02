@@ -14,11 +14,11 @@
 set -eu
 
 echo '* Backup modules ...'
-mv go.mod go.mod.bak
-mv go.sum go.sum.bak
+cp -f go.mod go.mod.bak
+cp -f go.sum go.sum.bak
 
-echo '* Create new blank go.mod ...'
-< go.mod.bak head -n 4 > go.mod
+echo '* Updating go.mod ...'
+go get -u ./...
 
 echo '* Run go tidy ...'
 go mod tidy
