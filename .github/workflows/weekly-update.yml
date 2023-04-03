@@ -37,8 +37,8 @@ jobs:
         run: |
           set -eu
           docker-compose --file ./.github/docker-compose.yml run tidy && \
-          docker-compose --file ./.github/docker-compose.yml run v1_16 && \
-          docker-compose --file ./.github/docker-compose.yml run v1_17 && \
+          docker-compose --file ./.github/docker-compose.yml run v1_18 && \
+          docker-compose --file ./.github/docker-compose.yml run v1_19 && \
           docker-compose --file ./.github/docker-compose.yml run latest
 
       - name: Create Pull Request on Change
