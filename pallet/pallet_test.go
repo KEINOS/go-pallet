@@ -55,6 +55,7 @@ func TestAsHistogram_InJSON_defalt(t *testing.T) {
 	hist := pallet.AsHistogram(imgRGBA)
 	perLine := false // Get JSON as one line
 
+	//nolint:goconst // false positive
 	expectJSON := "{" +
 		"\"r\":[" +
 		"3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," +

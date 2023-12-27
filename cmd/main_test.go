@@ -92,6 +92,7 @@ func Test_main_as_histogram_default(t *testing.T) {
 
 	assert.Equal(t, 0, capturedCode, "exit status should be zero on success")
 
+	//nolint:goconst // false positive
 	expect := "{" +
 		"\"r\":[18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," +
 		"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," +

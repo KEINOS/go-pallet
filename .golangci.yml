@@ -1,6 +1,5 @@
 run:
   tests: true
-  fast: true
   build-tags:
     - golangci
   skip-dirs:
@@ -16,23 +15,20 @@ linters:
   enable-all: true
   disable:
   # Disable deprecated/abandoned linters
+  - structcheck
   - scopelint
-  - deadcode
-  - nosnakecase
-  - exhaustivestruct
-  - varcheck
-  - golint
   - ifshort
   - interfacer
   - maligned
-  # Disabled because of generics
-  - rowserrcheck
-  - sqlclosecheck
-  - structcheck
-  - wastedassign
-  # Disable due to test/mock private functions
-  - testpackage
+  - exhaustivestruct
+  - nosnakecase
+  - varcheck
+  - deadcode
+  - golint
+  # Allow global variables
   - gochecknoglobals
+  # Disable due to use of external linters
+  - depguard
 
 linters-settings:
   cyclop:
