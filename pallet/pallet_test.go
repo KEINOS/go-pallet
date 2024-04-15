@@ -55,7 +55,6 @@ func TestAsHistogram_InJSON_defalt(t *testing.T) {
 	hist := pallet.AsHistogram(imgRGBA)
 	perLine := false // Get JSON as one line
 
-	//nolint:goconst // false positive
 	expectJSON := "{" +
 		"\"r\":[" +
 		"3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," +
@@ -130,7 +129,7 @@ func TestAsHistogram_InJSON_default_fail(t *testing.T) {
 	}()
 
 	// Mock JSONMarshal
-	pallet.JSONMarshal = func(v interface{}) ([]byte, error) {
+	pallet.JSONMarshal = func(_ interface{}) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 
@@ -156,7 +155,7 @@ func TestAsHistogram_InJSON_perline_fail(t *testing.T) {
 	}()
 
 	// Mock JSONMarshalIndent
-	pallet.JSONMarshalIndent = func(v interface{}, prefix string, indent string) ([]byte, error) {
+	pallet.JSONMarshalIndent = func(_ interface{}, _ string, _ string) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 
@@ -216,7 +215,7 @@ func TestPixInfoList_InJSON(t *testing.T) {
 		pallet.JSONMarshal = oldJSONMarshal
 	}()
 
-	pallet.JSONMarshal = func(v interface{}) ([]byte, error) {
+	pallet.JSONMarshal = func(_ interface{}) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 

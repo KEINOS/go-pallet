@@ -21,26 +21,17 @@ services:
       context: ..
       dockerfile: ./.github/Dockerfile
       args:
-        VARIANT: 1.18-alpine
+        VARIANT: 1.22-alpine
     volumes:
       - ..:/workspaces
     entrypoint: [ "./.github/go-mod-tidy.sh" ]
-  # Service v1_18 runs the tests on Go v1.18
-  v1_18:
+  # Service v1_22 runs the tests on Go v1.22. The minimum supported version
+  v1_22:
     build:
       context: ..
       dockerfile: ./.github/Dockerfile
       args:
-        VARIANT: 1.18-alpine
-    volumes:
-      - ..:/workspaces
-  # Service v1_19 runs the tests on Go v1.19
-  v1_19:
-    build:
-      context: ..
-      dockerfile: ./.github/Dockerfile
-      args:
-        VARIANT: 1.19-alpine
+        VARIANT: 1.22-alpine
     volumes:
       - ..:/workspaces
   # Service latest runs the tests on latest Go docker image

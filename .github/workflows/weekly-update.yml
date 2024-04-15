@@ -31,17 +31,16 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Update go.mod and run tests
         run: |
           set -eu
           docker-compose --file ./.github/docker-compose.yml run tidy && \
-          docker-compose --file ./.github/docker-compose.yml run v1_18 && \
-          docker-compose --file ./.github/docker-compose.yml run v1_19 && \
+          docker-compose --file ./.github/docker-compose.yml run v1_22 && \
           docker-compose --file ./.github/docker-compose.yml run latest
 
       - name: Create Pull Request on Change
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v6
         with:
             token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

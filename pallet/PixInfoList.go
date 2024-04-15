@@ -54,7 +54,7 @@ func (p PixInfoList) inJSONPerLine() (string, error) {
 	result := "[\n"
 	lenList := len(p)
 
-	for index := 0; index < lenList; index++ {
+	for index := range lenList {
 		a := p[index]
 
 		byteData, err := JSONMarshal(a)

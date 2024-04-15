@@ -2,7 +2,7 @@
 #  Test Container for Vaious Go Versions
 # =============================================================================
 # Default version
-ARG VARIANT="1.14-alpine"
+ARG VARIANT="1.22-alpine"
 
 # -----------------------------------------------------------------------------
 #  Main Stage

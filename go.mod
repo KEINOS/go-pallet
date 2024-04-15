@@ -1,6 +1,8 @@
 module github.com/KEINOS/go-pallet
 
-go 1.18
+go 1.22
+
+toolchain go1.22.2
 
 require (
 	github.com/KEINOS/go-utiles v1.5.3

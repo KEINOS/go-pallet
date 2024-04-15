@@ -26,8 +26,8 @@ func Diff(img1, img2 *image.RGBA) (*image.RGBA, error) {
 		return uint8(math.Abs(float64(a) - float64(b)))
 	}
 
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
+	for y := range height {
+		for x := range width {
 			// Get color
 			red1, green1, blue1, alpha1 := img1.At(x, y).RGBA()
 			red2, green2, blue2, alpha2 := img2.At(x, y).RGBA()

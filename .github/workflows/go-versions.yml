@@ -1,4 +1,4 @@
-name: go1.18+
+name: go1.22+
 
 on:
   workflow_dispatch:
@@ -18,57 +18,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create image tag
+        uses: KEINOS/gh-action-hash-for-cache@main
         id: imagetag
-        run: |
-          HASH_IMAGE=${{ hashFiles('./.github/Dockerfile') }}
-          VARIANT=$(TZ=UTC-9 date '+%Y%m')
-          TAG="${HASH_IMAGE:0:7}:${VARIANT}"
-          PATH_TAR=${{ env.PATH_CACHE }}"/tar"
-          echo "::set-output name=TAG::${TAG}"
-          echo "::set-output name=PATH_TAR::${PATH_TAR}"
+        with:
+            path: |
+              './.github/Dockerfile'
+              './.github/docker-compose.yml'
+            variant: $(TZ=UTC-9 date '+%Y%m')
 
       - name: Cache or restore image archive
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.PATH_CACHE }}
-          key: ${{ steps.imagetag.outputs.TAG }}
+          key: ${{ steps.imagetag.outputs.hash }}
 
       - name: Load Docker images if exist
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          docker load --input ${{ steps.imagetag.outputs.PATH_TAR }}/github_v1_18_1.tar
-          docker load --input ${{ steps.imagetag.outputs.PATH_TAR }}/github_v1_19_1.tar
-          docker load --input ${{ steps.imagetag.outputs.PATH_TAR }}/github_latest_1.tar
+          docker load --input ${{ steps.imagetag.outputs.hash }}/github_v1_22_1.tar
+          docker load --input ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar
 
       - name: Pull base images if no-exist
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           : # Pull images one-by-one for stability
-          docker pull golang:1.18-alpine
-          docker pull golang:1.19-alpine
+          docker pull golang:1.22-alpine
           docker pull golang:alpine
 
       - name: Build Docker images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ${{ steps.imagetag.outputs.PATH_TAR }}
+          mkdir -p ${{ steps.imagetag.outputs.hash }}
           : # Build container images
           docker-compose --file ./.github/docker-compose.yml build
 
       - name: Save built images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          docker save --output ${{ steps.imagetag.outputs.PATH_TAR }}/github_v1_18_1.tar github_v1_18:latest
-          docker save --output ${{ steps.imagetag.outputs.PATH_TAR }}/github_v1_19_1.tar github_v1_19:latest
-          docker save --output ${{ steps.imagetag.outputs.PATH_TAR }}/github_latest_1.tar github_latest:latest
+          docker save --output ${{ steps.imagetag.outputs.hash }}/github_v1_19_1.tar github_v1_22:latest
+          docker save --output ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar github_latest:latest
 
-      - name: Run tests on Go 1.18
-        run: docker-compose --file ./.github/docker-compose.yml run v1_18
-      - name: Run tests on Go 1.19
-        run: docker-compose --file ./.github/docker-compose.yml run v1_19
+      - name: Run tests on Go 1.22 (least supported)
+        run: docker-compose --file ./.github/docker-compose.yml run v1_22
       - name: Run tests on latest Go
         run: docker-compose --file ./.github/docker-compose.yml run latest
