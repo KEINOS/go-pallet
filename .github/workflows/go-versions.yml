@@ -54,15 +54,15 @@ jobs:
         run: |
           mkdir -p ${{ steps.imagetag.outputs.hash }}
           : # Build container images
-          docker-compose --file ./.github/docker-compose.yml build
+          docker compose --file ./.github/docker-compose.yml build
 
       - name: Save built images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          docker save --output ${{ steps.imagetag.outputs.hash }}/github_v1_19_1.tar github_v1_22:latest
-          docker save --output ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar github_latest:latest
+          docker save --output ${{ steps.imagetag.outputs.hash }}/github_v1_19_1.tar github-v1_22:latest
+          docker save --output ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar github-latest:latest
 
       - name: Run tests on Go 1.22 (least supported)
-        run: docker-compose --file ./.github/docker-compose.yml run v1_22
+        run: docker compose --file ./.github/docker-compose.yml run v1_22
       - name: Run tests on latest Go
-        run: docker-compose --file ./.github/docker-compose.yml run latest
+        run: docker compose --file ./.github/docker-compose.yml run latest

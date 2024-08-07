@@ -36,9 +36,9 @@ jobs:
       - name: Update go.mod and run tests
         run: |
           set -eu
-          docker-compose --file ./.github/docker-compose.yml run tidy && \
-          docker-compose --file ./.github/docker-compose.yml run v1_22 && \
-          docker-compose --file ./.github/docker-compose.yml run latest
+          docker compose --file ./.github/docker-compose.yml run tidy && \
+          docker compose --file ./.github/docker-compose.yml run v1_22 && \
+          docker compose --file ./.github/docker-compose.yml run latest
 
       - name: Create Pull Request on Change
         uses: peter-evans/create-pull-request@v6
