@@ -1,5 +1,5 @@
 # =============================================================================
-# Docker Compose file for testing on Go versions 1.18, 1.19 and latest.
+# Docker Compose file for testing on Go versions 1.22 and latest.
 # =============================================================================
 # It is recommended to run specifying a specific Go version and not at once.
 #
@@ -9,7 +9,7 @@
 #
 # Recommended usage:
 #   docker compose --file ./.github/docker-compose.yml run tidy && \
-#   docker compose --file ./.github/docker-compose.yml run v1_18
+#   docker compose --file ./.github/docker-compose.yml run v1_22
 #
 # NOT recommended to run all tests at once whith "up":
 #   docker compose --file ./.github/docker-compose.yml up

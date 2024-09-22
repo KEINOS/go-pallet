@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD041 MD033 -->
-[![go1.18+](https://img.shields.io/badge/Go-1.18+-blue?logo=go)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
+[![go1.22+](https://img.shields.io/badge/Go-1.22+-blue?logo=go)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
 [![Go Reference](https://pkg.go.dev/badge/github.com/KEINOS/go-pallet.svg)](https://pkg.go.dev/github.com/KEINOS/go-pallet/pallet)
 
 # go-pallet<sub><sup><sup>beta</sup></sup></sub>
@@ -136,7 +136,7 @@ $ pallet /path/to/image/sample.png --perline
 
 This template adopts the below security measures to start with.
 
-[![go1.18+](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Unit tests")
+[![go1.22+](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Unit tests")
 [![golangci-lint](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml "Static Analysis")
 [![codecov](https://codecov.io/gh/KEINOS/go-pallet/branch/main/graph/badge.svg?token=uW30s2bK8M)](https://codecov.io/gh/KEINOS/go-pallet "Code Coverage")
 [![Go Report Card](https://goreportcard.com/badge/github.com/KEINOS/go-pallet)](https://goreportcard.com/report/github.com/KEINOS/go-pallet "Code Quality")
