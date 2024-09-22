@@ -12,6 +12,15 @@ import (
 )
 
 // ----------------------------------------------------------------------------
+//  Constants
+// ----------------------------------------------------------------------------
+
+const (
+	MaxUint8 = 256
+	MaxInt32 = 2147483647
+)
+
+// ----------------------------------------------------------------------------
 //  Global Variables
 // ----------------------------------------------------------------------------
 
@@ -27,6 +36,13 @@ var JSONMarshalIndent = json.MarshalIndent
 //  Functions
 // ----------------------------------------------------------------------------
 
+// Uint32ToInt converts uint32 to int in the range of 0 to MaxUint8 (0-255).
+func Uint32ToInt(u uint32) int {
+	i := int(u)
+
+	return i / MaxUint8
+}
+
 // AsHistogram returns a Histogram object from an image.
 func AsHistogram(imgRGBA *image.RGBA) Histogram {
 	// Get sizes
@@ -41,10 +57,10 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 			r, g, b, a := imgRGBA.At(x, y).RGBA()
 
 			// Count up the corresponding shade strength of each channel
-			hist.R[int(uint8(r))]++
-			hist.G[int(uint8(g))]++
-			hist.B[int(uint8(b))]++
-			hist.A[int(uint8(a))]++
+			hist.R[Uint32ToInt(r)]++
+			hist.G[Uint32ToInt(g)]++
+			hist.B[Uint32ToInt(b)]++
+			hist.A[Uint32ToInt(a)]++
 		}
 	}
 
@@ -90,7 +106,8 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 func ColorToString(c color.Color) string {
 	r, g, b, a := c.RGBA()
 
-	return fmt.Sprintf("%03v%03v%03v%03v", uint8(r), uint8(g), uint8(b), uint8(a))
+	return fmt.Sprintf("%03v%03v%03v%03v",
+		Uint32ToInt(r), Uint32ToInt(g), Uint32ToInt(b), Uint32ToInt(a))
 }
 
 // Load returns the image.RGBA object pointer read image from pathFileImg.

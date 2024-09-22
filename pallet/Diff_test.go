@@ -90,7 +90,13 @@ func GetRandColorRGBA(t *testing.T, indexRGBA int) (pix color.RGBA, diff uint8) 
 
 	//nolint:gosec // In this case, it is sufficient to use the pseudorandom for testing.
 	randGen := rand.New(rand.NewSource(time.Now().UnixNano()))
-	diffInt := uint8(randGen.Intn(256)) // rand 0-256
+	randInt := randGen.Intn(256)
+
+	if randInt < 0 || randInt > 255 {
+		t.Fatalf("randInt is out of range: %d", randInt)
+	}
+
+	diffInt := uint8(randInt) // rand 0-256
 
 	switch indexRGBA {
 	case 0: // R
