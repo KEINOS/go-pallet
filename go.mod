@@ -17,7 +17,7 @@ require (
 require (
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.6.0 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.6.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
