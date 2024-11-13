@@ -97,7 +97,7 @@ func TestAsHistogram_InJSON_defalt(t *testing.T) {
 	actualJSON, err := hist.InJSON(perLine)
 	require.NoError(t, err)
 
-	assert.Equal(t, expectJSON, actualJSON)
+	assert.JSONEq(t, expectJSON, actualJSON)
 }
 
 func TestAsHistogram_InJSON_perline(t *testing.T) {
