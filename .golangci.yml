@@ -25,11 +25,11 @@ linters:
   #- varcheck
   #- deadcode
   #- golint
+  #- gomnd
+  #- execinquery
   #
   # Disable deprecated/abandoned linters
-  - gomnd
   - exportloopref
-  - execinquery
   # Allow global variables
   - gochecknoglobals
   # Disable due to use of external linters
