@@ -46,8 +46,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           : # Pull images one-by-one for stability
-          docker pull golang:1.22-alpine
-          docker pull golang:alpine
+          docker compose pull
 
       - name: Build Docker images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
@@ -59,10 +58,10 @@ jobs:
       - name: Save built images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          docker save --output ${{ steps.imagetag.outputs.hash }}/github_v1_19_1.tar github-v1_22:latest
+          docker save --output ${{ steps.imagetag.outputs.hash }}/github_min_1.tar github-min:latest
           docker save --output ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar github-latest:latest
 
-      - name: Run tests on Go 1.22 (least supported)
-        run: docker compose --file ./.github/docker-compose.yml run v1_22
+      - name: Run tests on minimum Go (least supported)
+        run: docker compose --file ./.github/docker-compose.yml run min
       - name: Run tests on latest Go
         run: docker compose --file ./.github/docker-compose.yml run latest
