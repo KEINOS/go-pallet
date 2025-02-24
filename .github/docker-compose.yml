@@ -1,5 +1,5 @@
 # =============================================================================
-# Docker Compose file for testing on Go versions 1.22 and latest.
+# Docker Compose file for testing on various Go versions.
 # =============================================================================
 # It is recommended to run specifying a specific Go version and not at once.
 #
@@ -8,30 +8,25 @@
 # it will cause failure in the other container becaue of missing "go.mod" file.
 #
 # Recommended usage:
-#   docker compose --file ./.github/docker-compose.yml run tidy && \
-#   docker compose --file ./.github/docker-compose.yml run v1_22
+#   docker compose --file ./.github/docker-compose.yml run min && \
+#   docker compose --file ./.github/docker-compose.yml run latest
 #
 # NOT recommended to run all tests at once whith "up":
 #   docker compose --file ./.github/docker-compose.yml up
-version: "3.9"
 services:
   # Service tidy updates the go.mod to the latest
   tidy:
     build:
       context: ..
       dockerfile: ./.github/Dockerfile
-      args:
-        VARIANT: 1.22-alpine
     volumes:
       - ..:/workspaces
     entrypoint: [ "./.github/go-mod-tidy.sh" ]
-  # Service v1_22 runs the tests on Go v1.22. The minimum supported version
-  v1_22:
+  # Service min runs the tests on minimum supported go version
+  min:
     build:
       context: ..
       dockerfile: ./.github/Dockerfile
-      args:
-        VARIANT: 1.22-alpine
     volumes:
       - ..:/workspaces
   # Service latest runs the tests on latest Go docker image

@@ -1,4 +1,4 @@
-name: go1.22+
+name: go compatibility
 
 on:
   workflow_dispatch:
@@ -39,14 +39,14 @@ jobs:
       - name: Load Docker images if exist
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
-          docker load --input ${{ steps.imagetag.outputs.hash }}/github_v1_22_1.tar
+          docker load --input ${{ steps.imagetag.outputs.hash }}/github_min_1.tar
           docker load --input ${{ steps.imagetag.outputs.hash }}/github_latest_1.tar
 
       - name: Pull base images if no-exist
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          : # Pull images one-by-one for stability
-          docker compose pull
+          : # Pull images ahead for stability
+          docker compose --file ./.github/docker-compose.yml pull
 
       - name: Build Docker images if no-exists
         if: steps.cache.outputs.cache-hit != 'true'
