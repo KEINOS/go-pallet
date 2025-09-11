@@ -2,7 +2,7 @@
 #  Test Container for Vaious Go Versions
 # =============================================================================
 # Default version (minimum supported version. See go.mod)
-ARG VARIANT="1.23-alpine"
+ARG VARIANT="1.24-alpine"
 
 # -----------------------------------------------------------------------------
 #  Main Stage
