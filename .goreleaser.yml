@@ -34,12 +34,11 @@
 #  Make sure to check the documentation as well at:
 #    https://goreleaser.com/customization/
 # =============================================================================
+version: 2
+
 before:
   hooks:
     - go mod download
-# Name to use on test release with --snapshot option.
-snapshot:
-  name_template: '{{ .Version }}'
 
 # Settings to build the binaries.
 builds:
@@ -84,21 +83,6 @@ universal_binaries:
     # Combine arm64 and amd64 as a single binary and remove each
     replace: true
 
-# Archiving the built binaries
-archives:
-  - name_template: >-
-      {{- .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end -}}
-    format_overrides:
-      - goos: windows
-        format: zip
-      - goos: darwin
-        format: zip
-
 # Create checksum file of archived files
 checksum:
   name_template: 'checksums.txt'
@@ -109,11 +93,11 @@ brews:
     # Name of the package: go-pallet.rb
     name: go-pallet
     # Target repo to tap: KEINOS/homebrew-apps
-    tap:
+    repository:
       owner: KEINOS
       name: homebrew-apps
     # Target directory: KEINOS/homebrew-apps/Formula
-    folder: Formula
+    directory: Formula
     # URL of the archive in releases page
     url_template: "https://github.com/KEINOS/go-pallet/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     # Author info to commit to the tap repo
