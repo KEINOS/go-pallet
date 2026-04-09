@@ -33,6 +33,7 @@ import (
 	"image/png"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 	"golang.org/x/image/bmp"
@@ -49,7 +50,9 @@ type Encoder func(io.Writer, image.Image) error
 //	// returns an error if something went wrong
 //	img, err := Open("exampleName")
 func Open(filename string) (image.Image, error) {
-	ptrFile, err := os.Open(filename)
+	safeFilename := filepath.Clean(filename)
+
+	ptrFile, err := os.Open(safeFilename)
 	if err != nil {
 		return nil, errors.Wrap(err, "no such file or directory")
 	}
@@ -101,7 +104,9 @@ func BMPEncoder() Encoder {
 //	err := Save("exampleName", img, imgio.JPEGEncoder(100))
 func Save(filename string, img image.Image, encoder Encoder) error {
 	// filename = strings.TrimSuffix(filename, filepath.Ext(filename))
-	ptrFile, err := os.Create(filename)
+	safeFilename := filepath.Clean(filename)
+
+	ptrFile, err := os.Create(safeFilename)
 	if err != nil {
 		return errors.Wrap(err, "failed to create file to save")
 	}

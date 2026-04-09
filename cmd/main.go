@@ -18,11 +18,12 @@ var (
 )
 
 type argT struct {
+	cli.Helper
+
 	PathFileImg  string `cli:"f,file"    usage:"file path of an image to analyze"`
 	AsHistogram  bool   `cli:"histogram" usage:"print the histogram of the given image in JSON"`
 	PrintPerLine bool   `cli:"p,perline" usage:"prints each JSON elements per line"`
 	ShowVersion  bool   `cli:"v,version" usage:"displays app version"`
-	cli.Helper
 }
 
 func main() {

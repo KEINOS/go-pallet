@@ -16,7 +16,9 @@ import (
 // ----------------------------------------------------------------------------
 
 const (
+	// MaxUint8 is the divisor to convert RGBA 16-bit channel values to 8-bit.
 	MaxUint8 = 256
+	// MaxInt32 is the maximum value of signed 32-bit integer.
 	MaxInt32 = 2147483647
 )
 

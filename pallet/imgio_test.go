@@ -137,7 +137,9 @@ func TestOpen_saved_image(t *testing.T) {
 		0xdf, 0x0, 0x0, 0x0, 0x0, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 	}
 
-	actual, err := os.ReadFile(pathFileTmp)
+	safePathFileTmp := filepath.Clean(pathFileTmp)
+
+	actual, err := os.ReadFile(safePathFileTmp)
 	require.NoError(t, err)
 
 	assert.Equal(t, expect, actual)
