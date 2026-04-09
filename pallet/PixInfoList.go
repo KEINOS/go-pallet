@@ -1,5 +1,7 @@
 package pallet
 
+import "strings"
+
 // ----------------------------------------------------------------------------
 //  Type: PixInfoList
 // ----------------------------------------------------------------------------
@@ -54,6 +56,8 @@ func (p PixInfoList) inJSONPerLine() (string, error) {
 	result := "[\n"
 	lenList := len(p)
 
+	var resultSb57 strings.Builder
+
 	for index := range lenList {
 		a := p[index]
 
@@ -62,13 +66,16 @@ func (p PixInfoList) inJSONPerLine() (string, error) {
 			return "", err
 		}
 
-		result += string(byteData)
+		resultSb57.Write(byteData)
+
 		if index != (lenList - 1) {
-			result += ","
+			resultSb57.WriteString(",")
 		}
 
-		result += "\n"
+		resultSb57.WriteString("\n")
 	}
+
+	result += resultSb57.String()
 
 	result += "]"
 

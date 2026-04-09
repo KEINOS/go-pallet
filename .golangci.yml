@@ -1,41 +1,9 @@
-run:
-  tests: true
-  build-tags:
-    - golangci
-  allow-parallel-runners: true
-issues:
-  exclude-dirs:
-    - .github
-    - .vscode
-
-output:
-  sort-results: true
+version: "2"
 
 linters:
-  enable-all: true
-  disable:
-  # Remove deprecated linters that are deacivated
-  #- structcheck
-  #- scopelint
-  #- ifshort
-  #- interfacer
-  #- maligned
-  #- exhaustivestruct
-  #- nosnakecase
-  #- varcheck
-  #- deadcode
-  #- golint
-  #- gomnd
-  #- execinquery
-  #
-  # Disable deprecated/abandoned linters
-  - exportloopref
-  # Allow global variables
-  - gochecknoglobals
-  # Disable due to use of external linters
-  - depguard
-
-linters-settings:
-  cyclop:
-    # The maximal code complexity to report (Default: 10).
-    max-complexity: 15
+    default: all
+    disable:
+        # Deprecated in v2; replaced by wsl_v5.
+        - wsl
+        # Allow to use external dependencies.
+        - depguard

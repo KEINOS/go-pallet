@@ -53,11 +53,16 @@ func Open(filename string) (image.Image, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "no such file or directory")
 	}
-	defer ptrFile.Close()
 
 	img, _, err := image.Decode(ptrFile)
+	closeErr := ptrFile.Close()
+
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode image file")
+	}
+
+	if closeErr != nil {
+		return nil, errors.Wrap(closeErr, "failed to close image file")
 	}
 
 	return img, nil
@@ -101,7 +106,16 @@ func Save(filename string, img image.Image, encoder Encoder) error {
 		return errors.Wrap(err, "failed to create file to save")
 	}
 
-	defer ptrFile.Close()
+	encodeErr := encoder(ptrFile, img)
+	closeErr := ptrFile.Close()
 
-	return encoder(ptrFile, img)
+	if encodeErr != nil {
+		return encodeErr
+	}
+
+	if closeErr != nil {
+		return errors.Wrap(closeErr, "failed to close image file")
+	}
+
+	return nil
 }

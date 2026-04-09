@@ -124,12 +124,13 @@ func TestAsHistogram_InJSON_perline(t *testing.T) {
 func TestAsHistogram_InJSON_default_fail(t *testing.T) {
 	// Backup and defer restore
 	oldJSONMarshal := pallet.JSONMarshal
+
 	defer func() {
 		pallet.JSONMarshal = oldJSONMarshal
 	}()
 
 	// Mock JSONMarshal
-	pallet.JSONMarshal = func(_ interface{}) ([]byte, error) {
+	pallet.JSONMarshal = func(_ any) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 
@@ -150,12 +151,13 @@ func TestAsHistogram_InJSON_default_fail(t *testing.T) {
 func TestAsHistogram_InJSON_perline_fail(t *testing.T) {
 	// Backup and defer restore
 	oldJSONMarshalIndent := pallet.JSONMarshalIndent
+
 	defer func() {
 		pallet.JSONMarshalIndent = oldJSONMarshalIndent
 	}()
 
 	// Mock JSONMarshalIndent
-	pallet.JSONMarshalIndent = func(_ interface{}, _ string, _ string) ([]byte, error) {
+	pallet.JSONMarshalIndent = func(_ any, _ string, _ string) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 
@@ -211,11 +213,12 @@ func TestPixInfoList_InJSON(t *testing.T) {
 
 	// Mock json.Marshal to fail
 	oldJSONMarshal := pallet.JSONMarshal
+
 	defer func() {
 		pallet.JSONMarshal = oldJSONMarshal
 	}()
 
-	pallet.JSONMarshal = func(_ interface{}) ([]byte, error) {
+	pallet.JSONMarshal = func(_ any) ([]byte, error) {
 		return []byte{}, errors.New("forced fail")
 	}
 

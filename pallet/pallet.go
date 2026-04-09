@@ -24,13 +24,16 @@ const (
 //  Global Variables
 // ----------------------------------------------------------------------------
 
-// JSONMarshal is a copy of json.Marshal() to ease mock during test.
-// Temporary replace the function to mock its behavior.
-var JSONMarshal = json.Marshal
+//nolint:gochecknoglobals // Allow to ease mock during test.
+var (
+	// JSONMarshal is a copy of json.Marshal() to ease mock during test.
+	// Temporary replace the function to mock its behavior.
+	JSONMarshal = json.Marshal
 
-// JSONMarshalIndent is a copy of json.MarshalIndent() to ease mock during test.
-// Temporary replace the function to mock its behavior.
-var JSONMarshalIndent = json.MarshalIndent
+	// JSONMarshalIndent is a copy of json.MarshalIndent() to ease mock during test.
+	// Temporary replace the function to mock its behavior.
+	JSONMarshalIndent = json.MarshalIndent
+)
 
 // ----------------------------------------------------------------------------
 //  Functions

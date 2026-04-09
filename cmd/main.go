@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+//nolint:gochecknoglobals // Allow for app info.
 var (
 	version string // The app version assigned via build flag.
 	commit  string // The commit ID assigned via build flag.
