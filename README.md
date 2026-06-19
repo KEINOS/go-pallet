@@ -2,21 +2,22 @@
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/KEINOS/go-pallet)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
 [![Go Reference](https://pkg.go.dev/badge/github.com/KEINOS/go-pallet.svg)](https://pkg.go.dev/github.com/KEINOS/go-pallet/pallet)
 
-# go-pallet<sub><sup><sup>beta</sup></sup></sub>
+# go-pallet
 
-The `go-pallet` package is a Go library for analyzing the colors used in an image. You can use it to get a color list or a histogram.
+`go-pallet` is a Go package for analyzing colors in images.
+It also includes the `pallet` command, which prints color occurrence data or per-channel histograms as JSON.
 
 ## Library Usage
 
-```go
-go get "github.com/KEINOS/go-pallet"
+```console
+go get github.com/KEINOS/go-pallet/pallet
 ```
 
 - Basic Usage
 
 ```go
 /*
-  This example returns a color list with RGBA values
+  This example returns the unique RGBA colors in an image
   and their occurrence counts.
 */
 
@@ -28,8 +29,9 @@ if err != nil {
   log.Fatal(err)
 }
 
-// Get all the color combinations used in an image.
-// Returned data are sorted in order of frequency of use.
+// Get all unique colors used in the image.
+// Results are sorted by descending occurrence count, with RGBA values used
+// as a deterministic ascending tie-breaker.
 pixInfoList := pallet.ByOccurrence(imgRGBA)
 
 // Print the two most common colors:
@@ -78,7 +80,7 @@ fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
 
 ## Command Usage
 
-The repository also includes a [simple CLI implementation](./cmd/main.go).
+The repository also includes the [`pallet` command](./cmd/pallet/main.go).
 
 ## Install
 
@@ -94,9 +96,8 @@ brew install KEINOS/apps/go-pallet
 go install "github.com/KEINOS/go-pallet/cmd/pallet@latest"
 ```
 
-- Manual Install
-  - [releases page](https://github.com/KEINOS/go-pallet/releases/latest)
-  - macOS (Intel/AMD64/M1), Windows (AMD64/Intel), Linux (Intel/AMD64, Arm 5,6,7, Arm64)
+- Prebuilt binaries
+  - Download from the [latest release](https://github.com/KEINOS/go-pallet/releases/latest).
 
 ### Usage
 
@@ -119,14 +120,14 @@ Options:
 
 ```shellsession
 $ pallet /path/to/image/sample.png
-[{"r":255,"g":0,"b":0,"a":255,"count":1},{"r":0,"g":0,"b":255,"a":255,"count":1},{"r":0,"g":255,"b":0,"a":255,"count":1},{"r":0,"g":0,"b":0,"a":0,"count":1}]
+[{"r":0,"g":0,"b":0,"a":0,"count":1},{"r":0,"g":0,"b":255,"a":255,"count":1},{"r":0,"g":255,"b":0,"a":255,"count":1},{"r":255,"g":0,"b":0,"a":255,"count":1}]
 
 $ pallet /path/to/image/sample.png --perline
 [
-{"r":255,"g":0,"b":0,"a":255,"count":1},
+{"r":0,"g":0,"b":0,"a":0,"count":1},
 {"r":0,"g":0,"b":255,"a":255,"count":1},
 {"r":0,"g":255,"b":0,"a":255,"count":1},
-{"r":0,"g":0,"b":0,"a":0,"count":1}
+{"r":255,"g":0,"b":0,"a":255,"count":1}
 ]
 ```
 
@@ -146,4 +147,4 @@ This project uses the following status checks.
 
 ## License
 
-- [MIT](https://github.com/KEINOS/go-pallet/LICENSE.txt) License. Copyright (c) [KEINOS](https://github.com/KEINOS) and [The Contributors](https://github.com/KEINOS/go-pallet/graphs/contributors).
+- [MIT](./LICENSE) License. Copyright (c) [KEINOS](https://github.com/KEINOS) and [The Contributors](https://github.com/KEINOS/go-pallet/graphs/contributors).
