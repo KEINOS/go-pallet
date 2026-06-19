@@ -1,11 +1,12 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # =============================================================================
 #  Configuration for `goreleaser`.
 # =============================================================================
 #  What It Is
 #
 #  This is a configuration file for `goreleaser` command to "automate" releasing
-#  the built binaries via GitHub action on release push. It automates Homebrew's
-#  tap release as well.
+#  the built binaries via GitHub action on release push. It automates the
+#  Homebrew Cask release as well.
 #
 #  What It Does
 #
@@ -15,7 +16,8 @@
 #      - Linux, macOS and Windows.
 #      - AMD (Intel/x86_64) and ARM64 for all OS and ARM32 v5,6,7 for Linux.
 #    2. Archives the built binaries and create checksum.txt file.
-#    3. Create a tap config file for Homebrew. (./dist/go-pallet.rb)
+#    3. Create a Homebrew Cask config file.
+#       (./dist/homebrew/Casks/go-pallet.rb)
 #    4. It pushes the archived assets to the release page on GitHub.
 #    5. It pushes the config file for Homebrew tap installation to the repo.
 #           https://github.com/KEINOS/homebrew-apps/
@@ -28,23 +30,22 @@
 #  configuration file to the Homebrew tap repo of this app.
 #
 #  For local-test run:
-#    $ goreleaser release --snapshot --skip-publish --rm-dist
+#    $ goreleaser release --snapshot --clean --skip=publish
 #    $ # *Note: Check the ./dist/ dir after ran.
 #
 #  Make sure to check the documentation as well at:
 #    https://goreleaser.com/customization/
 # =============================================================================
 version: 2
-
+project_name: go-pallet
 before:
   hooks:
     - go mod download
-
 # Settings to build the binaries.
 builds:
-  -
+  - id: pallet
     # Target directory of main.go
-    main: ./cmd
+    main: ./cmd/pallet
     # Output binary name
     binary: pallet
     env:
@@ -75,31 +76,30 @@ builds:
     # Build the app as static binary and embed version and commit info
     ldflags:
       - -s -w -extldflags '-static' -X 'main.version={{.Version}}' -X 'main.commit={{ .ShortCommit }}'
-
 # macOS universal binaries for both arm64 and amd64
 universal_binaries:
-  -
+  - id: pallet-universal
+    ids:
+      - pallet
     name_template: 'pallet'
     # Combine arm64 and amd64 as a single binary and remove each
     replace: true
-
 # Create checksum file of archived files
 checksum:
   name_template: 'checksums.txt'
-
 # Release/update Homebrew tap repository
-brews:
-  -
-    # Name of the package: go-pallet.rb
-    name: go-pallet
+# Name of the Cask: go-pallet.rb
+homebrew_casks:
+  - name: go-pallet
     # Target repo to tap: KEINOS/homebrew-apps
     repository:
       owner: KEINOS
       name: homebrew-apps
-    # Target directory: KEINOS/homebrew-apps/Formula
-    directory: Formula
-    # URL of the archive in releases page
-    url_template: "https://github.com/KEINOS/go-pallet/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    # Target directory: KEINOS/homebrew-apps/Casks
+    directory: Casks
+    # Verify that release assets are hosted by this repository.
+    url:
+      verified: github.com/KEINOS/go-pallet
     # Author info to commit to the tap repo
     commit_author:
       name: goreleaserbot
@@ -107,11 +107,12 @@ brews:
     # Message to display on `brew search` or `brew info`
     description: "Color pallet extractor from an image."
     homepage: "https://github.com/KEINOS/go-pallet/"
-    # Let brew command pull the archive via cURL
-    download_strategy: CurlDownloadStrategy
-    # Let brew command instll the binary as `go-pallet`
-    install: |
-      bin.install "pallet"
-    # Smoke test to run after install
-    test: |
-      system "#{bin}/pallet --version"
+    binaries:
+      - pallet
+    # Remove macOS quarantine metadata from the unsigned binary.
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/pallet"]
+          end
