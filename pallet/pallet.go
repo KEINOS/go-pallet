@@ -74,12 +74,12 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 
 // ByOccurrence returns the image colors sorted by occurrence.
 func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
-	// Get sizes
+	// Get image bounds and estimate the maximum number of unique pixels.
 	bounds := imgRGBA.Bounds()
-	lenImg := bounds.Dx() * bounds.Dx()
+	pixelCount := bounds.Dx() * bounds.Dy()
 
-	// Count up occurrence
-	pixmap := make(map[string]int, lenImg)
+	// Count the number of times each color appears.
+	pixmap := make(map[string]int, pixelCount)
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
@@ -89,7 +89,7 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 		}
 	}
 
-	// Re-map to PixInfoList
+	// Convert the map into PixInfoList.
 	pixList := make(PixInfoList, len(pixmap))
 
 	i := 0

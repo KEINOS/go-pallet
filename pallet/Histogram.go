@@ -20,13 +20,12 @@ type Histogram struct {
 //  Constructor
 // ----------------------------------------------------------------------------
 
-// NewHistogram returns an initialized object pointer of Histogram.
+// NewHistogram returns an initialized Histogram.
 func NewHistogram() *Histogram {
 	shadesMax := 256 // each channel has 256 shade levels (0-255)
 
-	// Initializes each channel with an index in the range of 0 to 255. Each
-	// index represents the shade level of the color channel, and its value will
-	// be the occurrence.
+	// Each channel has 256 entries. The index is the shade level, and the value
+	// is the number of pixels with that shade.
 	return &Histogram{
 		R: make([]int, shadesMax),
 		G: make([]int, shadesMax),
@@ -39,18 +38,17 @@ func NewHistogram() *Histogram {
 //  Methods
 // ----------------------------------------------------------------------------
 
-// InJSON returns the histogram of the image in JSON string.
+// InJSON returns the histogram as a JSON string.
 //
 //	{
 //	  "r": [...],
 //	  "g": [...],
-//	  "g": [...],
+//	  "b": [...],
 //	  "a": [...],
 //	}
 //
-// Each channel contains a matrix consisting of 256 elements. The index of the
-// matrix represents the shadow level, and the value represents the number of
-// occurrence of that level.
+// Each channel contains 256 entries. The index is the shade level, and the
+// value is the number of pixels with that shade.
 func (h *Histogram) InJSON(perLine bool) (string, error) {
 	if perLine {
 		byteJSON, err := JSONMarshalIndent(h, "", "  ")

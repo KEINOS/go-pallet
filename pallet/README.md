@@ -6,72 +6,92 @@
 import "github.com/KEINOS/go-pallet/pallet"
 ```
 
-Package pallet is the core package of the Pallet to use it as a library\. Which simply returns the colors \(RGBA\) used in an image\.
+Package pallet provides the core library for analyzing the colors used in an image.
 
-For the actual application see \.\./cmd/main\.go\.
+For the CLI application, see ../cmd/main.go.
 
 ## Index
 
+- [Constants](<#constants>)
 - [Variables](<#variables>)
-- [func ColorToString(c color.Color) string](<#func-colortostring>)
-- [func Diff(img1, img2 *image.RGBA) (diff *image.RGBA, err error)](<#func-diff>)
-- [func Load(pathFileImg string) (*image.RGBA, error)](<#func-load>)
-- [func Open(filename string) (image.Image, error)](<#func-open>)
-- [func Save(filename string, img image.Image, encoder Encoder) error](<#func-save>)
-- [type Encoder](<#type-encoder>)
-  - [func BMPEncoder() Encoder](<#func-bmpencoder>)
-  - [func JPEGEncoder(quality int) Encoder](<#func-jpegencoder>)
-  - [func PNGEncoder() Encoder](<#func-pngencoder>)
-- [type Histogram](<#type-histogram>)
-  - [func AsHistogram(imgRGBA *image.RGBA) Histogram](<#func-ashistogram>)
-  - [func NewHistogram() *Histogram](<#func-newhistogram>)
-  - [func (h *Histogram) InJSON(perLine bool) (string, error)](<#func-histogram-injson>)
-- [type PixInfo](<#type-pixinfo>)
-  - [func (p PixInfo) GetKey() string](<#func-pixinfo-getkey>)
-  - [func (p PixInfo) MarshalJSON() ([]byte, error)](<#func-pixinfo-marshaljson>)
-- [type PixInfoList](<#type-pixinfolist>)
-  - [func ByOccurrence(imgRGBA *image.RGBA) PixInfoList](<#func-byoccurrence>)
-  - [func (p PixInfoList) InJSON(perLine bool) (string, error)](<#func-pixinfolist-injson>)
-  - [func (p PixInfoList) Len() int](<#func-pixinfolist-len>)
-  - [func (p PixInfoList) Less(i, j int) bool](<#func-pixinfolist-less>)
-  - [func (p PixInfoList) Swap(i, j int)](<#func-pixinfolist-swap>)
-- [type PixKey](<#type-pixkey>)
-  - [func (k PixKey) GetAlpha() int](<#func-pixkey-getalpha>)
-  - [func (k PixKey) GetBlue() int](<#func-pixkey-getblue>)
-  - [func (k PixKey) GetGreen() int](<#func-pixkey-getgreen>)
-  - [func (k PixKey) GetRed() int](<#func-pixkey-getred>)
-  - [func (k PixKey) NewPixInfo(count int) PixInfo](<#func-pixkey-newpixinfo>)
+- [func ColorToString\(c color.Color\) string](<#ColorToString>)
+- [func Diff\(img1, img2 \*image.RGBA\) \(\*image.RGBA, error\)](<#Diff>)
+- [func Load\(pathFileImg string\) \(\*image.RGBA, error\)](<#Load>)
+- [func Open\(filename string\) \(image.Image, error\)](<#Open>)
+- [func Save\(filename string, img image.Image, encoder Encoder\) error](<#Save>)
+- [func Uint32ToInt\(u uint32\) int](<#Uint32ToInt>)
+- [type Encoder](<#Encoder>)
+  - [func BMPEncoder\(\) Encoder](<#BMPEncoder>)
+  - [func JPEGEncoder\(quality int\) Encoder](<#JPEGEncoder>)
+  - [func PNGEncoder\(\) Encoder](<#PNGEncoder>)
+- [type Histogram](<#Histogram>)
+  - [func AsHistogram\(imgRGBA \*image.RGBA\) Histogram](<#AsHistogram>)
+  - [func NewHistogram\(\) \*Histogram](<#NewHistogram>)
+  - [func \(h \*Histogram\) InJSON\(perLine bool\) \(string, error\)](<#Histogram.InJSON>)
+- [type PixInfo](<#PixInfo>)
+  - [func \(p PixInfo\) GetKey\(\) string](<#PixInfo.GetKey>)
+  - [func \(p PixInfo\) MarshalJSON\(\) \(\[\]byte, error\)](<#PixInfo.MarshalJSON>)
+- [type PixInfoList](<#PixInfoList>)
+  - [func ByOccurrence\(imgRGBA \*image.RGBA\) PixInfoList](<#ByOccurrence>)
+  - [func \(p PixInfoList\) InJSON\(perLine bool\) \(string, error\)](<#PixInfoList.InJSON>)
+  - [func \(p PixInfoList\) Len\(\) int](<#PixInfoList.Len>)
+  - [func \(p PixInfoList\) Less\(i, j int\) bool](<#PixInfoList.Less>)
+  - [func \(p PixInfoList\) Swap\(i, j int\)](<#PixInfoList.Swap>)
+- [type PixKey](<#PixKey>)
+  - [func \(k PixKey\) GetAlpha\(\) int](<#PixKey.GetAlpha>)
+  - [func \(k PixKey\) GetBlue\(\) int](<#PixKey.GetBlue>)
+  - [func \(k PixKey\) GetGreen\(\) int](<#PixKey.GetGreen>)
+  - [func \(k PixKey\) GetRed\(\) int](<#PixKey.GetRed>)
+  - [func \(k PixKey\) NewPixInfo\(count int\) PixInfo](<#PixKey.NewPixInfo>)
 
+## Constants
+
+<a name="MaxUint8"></a>
+
+```go
+const (
+    // MaxUint8 is the divisor to convert RGBA 16-bit channel values to 8-bit.
+    MaxUint8 = 256
+    // MaxInt32 is the maximum value of signed 32-bit integer.
+    MaxInt32 = 2147483647
+)
+```
 
 ## Variables
 
-JSONMarshal is a copy of json\.Marshal\(\) to ease mock during test\. Temporary replace the function to mock its behavior\.
+<a name="JSONMarshal"></a>
 
 ```go
-var JSONMarshal = json.Marshal
+var (
+    // JSONMarshal is a copy of json.Marshal to ease mocking during tests.
+    // Replace it temporarily when a test needs to force an error path.
+    JSONMarshal = json.Marshal
+
+    // JSONMarshalIndent is a copy of json.MarshalIndent to ease mocking during
+    // tests. Replace it temporarily when a test needs to force an error path.
+    JSONMarshalIndent = json.MarshalIndent
+)
 ```
 
-JSONMarshalIndent is a copy of json\.MarshalIndent\(\) to ease mock during test\. Temporary replace the function to mock its behavior\.
+<a name="ColorToString"></a>
 
-```go
-var JSONMarshalIndent = json.MarshalIndent
-```
-
-## func ColorToString
+## func [ColorToString](<https://github.com/KEINOS/go-pallet/blob/main/pallet/pallet.go#L111>)
 
 ```go
 func ColorToString(c color.Color) string
 ```
 
-ColorToString returns color\.RGBA object's RGBA value as a RRRGGGBBBAAA formatted string\. Mostly used for the key of a map\.
+ColorToString returns a color value in RRRGGGBBBAAA format. It is mainly used as a map key.
 
-## func Diff
+<a name="Diff"></a>
+
+## func [Diff](<https://github.com/KEINOS/go-pallet/blob/main/pallet/diff.go#L15>)
 
 ```go
-func Diff(img1, img2 *image.RGBA) (diff *image.RGBA, err error)
+func Diff(img1, img2 *image.RGBA) (*image.RGBA, error)
 ```
 
-Diff returns an image\.RGBA object whose pixels are the absolute difference values between two images\. The two input images must have the same bounds\.
+Diff returns an image.RGBA object whose pixels are the absolute difference values between two images. The two input images must have the same bounds.
 
 <details><summary>Example</summary>
 <p>
@@ -80,36 +100,37 @@ Diff returns an image\.RGBA object whose pixels are the absolute difference valu
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
-	"log"
+ "fmt"
+ "log"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	// Get image1 (3x3pix)
-	pathFileImg1 := "../testdata/rgbacmykw.png"
+ // Get image1 (3x3pix)
+ const pathFileImg1 = "../testdata/rgbacmykw.png"
 
-	imgRGBA1, err := pallet.Load(pathFileImg1)
-	if err != nil {
-		log.Fatal(err)
-	}
+ imgRGBA1, err := pallet.Load(pathFileImg1)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// Get image2 (3x3pix)
-	pathFileImg2 := "../testdata/rgbacmykw.png"
+ // Get image2 (3x3pix)
+ const pathFileImg2 = "../testdata/rgbacmykw.png"
 
-	imgRGBA2, err := pallet.Load(pathFileImg2)
-	if err != nil {
-		log.Fatal(err)
-	}
+ imgRGBA2, err := pallet.Load(pathFileImg2)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// Get the absolute diff between two images
-	imgDiff, err := pallet.Diff(imgRGBA1, imgRGBA2)
-	if err != nil {
-		log.Fatal(err)
-	}
+ // Get the absolute diff between two images
+ imgDiff, err := pallet.Diff(imgRGBA1, imgRGBA2)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// It should be all zero since it's the same image
-	fmt.Printf("%v", imgDiff.Pix)
+ // It should be all zero since it's the same image
+ fmt.Printf("%v", imgDiff.Pix)
 
 }
 ```
@@ -123,69 +144,91 @@ func main() {
 </p>
 </details>
 
-## func Load
+<a name="Load"></a>
+
+## func [Load](<https://github.com/KEINOS/go-pallet/blob/main/pallet/pallet.go#L119>)
 
 ```go
 func Load(pathFileImg string) (*image.RGBA, error)
 ```
 
-Load returns the image\.RGBA object pointer read image from pathFileImg\.
+Load reads an image file and returns it as image.RGBA.
 
-## func Open
+<a name="Open"></a>
+
+## func [Open](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L49>)
 
 ```go
 func Open(filename string) (image.Image, error)
 ```
 
-Open loads and decodes an image from a file and returns it\.
+Open loads and decodes an image from a file.
 
-Usage example: // Decodes an image from a file with the given filename // returns an error if something went wrong img\, err := Open\("exampleName"\)
+<a name="Save"></a>
 
-## func Save
+## func [Save](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L85>)
 
 ```go
 func Save(filename string, img image.Image, encoder Encoder) error
 ```
 
-Save creates a file and writes to it an image using the provided encoder\.
+Save creates a file and writes the image using the provided encoder.
 
-Usage example: // Save an image to a file in PNG format\, // returns an error if something went wrong err := Save\("exampleName"\, img\, imgio\.JPEGEncoder\(100\)\)
+<a name="Uint32ToInt"></a>
 
-## type Encoder
+## func [Uint32ToInt](<https://github.com/KEINOS/go-pallet/blob/main/pallet/pallet.go#L45>)
 
-Encoder encodes the provided image and writes it\.
+```go
+func Uint32ToInt(u uint32) int
+```
+
+Uint32ToInt converts a uint32 channel value to an 8\-bit int.
+
+<a name="Encoder"></a>
+
+## type [Encoder](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L46>)
+
+Encoder encodes the provided image and writes it.
 
 ```go
 type Encoder func(io.Writer, image.Image) error
 ```
 
-### func BMPEncoder
+<a name="BMPEncoder"></a>
+
+### func [BMPEncoder](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L77>)
 
 ```go
 func BMPEncoder() Encoder
 ```
 
-BMPEncoder returns an encoder to BMP\.
+BMPEncoder returns an encoder that writes BMP output.
 
-### func JPEGEncoder
+<a name="JPEGEncoder"></a>
+
+### func [JPEGEncoder](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L61>)
 
 ```go
 func JPEGEncoder(quality int) Encoder
 ```
 
-JPEGEncoder returns an encoder to JPEG given the argument 'quality'\.
+JPEGEncoder returns an encoder that writes JPEG output.
 
-### func PNGEncoder
+<a name="PNGEncoder"></a>
+
+### func [PNGEncoder](<https://github.com/KEINOS/go-pallet/blob/main/pallet/imgio.go#L69>)
 
 ```go
 func PNGEncoder() Encoder
 ```
 
-PNGEncoder returns an encoder to PNG\.
+PNGEncoder returns an encoder that writes PNG output.
 
-## type Histogram
+<a name="Histogram"></a>
 
-Histogram holds the total occurrence of each RGBA channel\.
+## type [Histogram](<https://github.com/KEINOS/go-pallet/blob/main/pallet/Histogram.go#L12-L17>)
+
+Histogram holds the total occurrence of each RGBA channel.
 
 ```go
 type Histogram struct {
@@ -196,13 +239,15 @@ type Histogram struct {
 }
 ```
 
-### func AsHistogram
+<a name="AsHistogram"></a>
+
+### func [AsHistogram](<https://github.com/KEINOS/go-pallet/blob/main/pallet/pallet.go#L52>)
 
 ```go
 func AsHistogram(imgRGBA *image.RGBA) Histogram
 ```
 
-AsHistogram returns a Histogram object from an image\.
+AsHistogram returns the per\-channel histogram of an image.
 
 <details><summary>Example</summary>
 <p>
@@ -211,31 +256,32 @@ AsHistogram returns a Histogram object from an image\.
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
-	"log"
+ "fmt"
+ "log"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	// 2x2 pixel image with each RGBA color of 1-pixel
-	pathFile := "../testdata/r1g1b1a1.png"
+ // 2x2 pixel image with each RGBA color of 1-pixel
+ const pathFile = "../testdata/r1g1b1a1.png"
 
-	imgRGBA, err := pallet.Load(pathFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+ imgRGBA, err := pallet.Load(pathFile)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	hist := pallet.AsHistogram(imgRGBA)
+ hist := pallet.AsHistogram(imgRGBA)
 
-	// Print the occurrences of each color channel's shade level.
-	//   <channel>[<shade level>] = <occurrence>
-	// If a red pixel with max-opacity (R,G,B,A=255,0,0,255) appeared twice in
-	// an image then it will be:
-	//   r[255]=2, g[0]=2, b[0]=2, a[255]=2
-	fmt.Printf("r[0]=%v, r[255]=%v\n", hist.R[0], hist.R[255])
-	fmt.Printf("g[0]=%v, g[255]=%v\n", hist.G[0], hist.G[255])
-	fmt.Printf("b[0]=%v, b[255]=%v\n", hist.B[0], hist.B[255])
-	fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
+ // Print the occurrences of each color channel's shade level.
+ //   <channel>[<shade level>] = <occurrence>
+ // If a red pixel with max-opacity (R,G,B,A=255,0,0,255) appeared twice in
+ // an image then it will be:
+ //   r[255]=2, g[0]=2, b[0]=2, a[255]=2
+ fmt.Printf("r[0]=%v, r[255]=%v\n", hist.R[0], hist.R[255])
+ fmt.Printf("g[0]=%v, g[255]=%v\n", hist.G[0], hist.G[255])
+ fmt.Printf("b[0]=%v, b[255]=%v\n", hist.B[0], hist.B[255])
+ fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
 
 }
 ```
@@ -252,54 +298,62 @@ a[0]=1, a[255]=3
 </p>
 </details>
 
-### func NewHistogram
+<a name="NewHistogram"></a>
+
+### func [NewHistogram](<https://github.com/KEINOS/go-pallet/blob/main/pallet/Histogram.go#L24>)
 
 ```go
 func NewHistogram() *Histogram
 ```
 
-NewHistogram returns an initialized object pointer of Histogram\.
+NewHistogram returns an initialized Histogram.
 
-### func \(\*Histogram\) InJSON
+<a name="Histogram.InJSON"></a>
+
+### func \(\*Histogram\) [InJSON](<https://github.com/KEINOS/go-pallet/blob/main/pallet/Histogram.go#L52>)
 
 ```go
 func (h *Histogram) InJSON(perLine bool) (string, error)
 ```
 
-InJSON returns the histogram of the image in JSON string\.
+InJSON returns the histogram as a JSON string.
 
 ```
 {
   "r": [...],
   "g": [...],
-  "g": [...],
+  "b": [...],
   "a": [...],
 }
 ```
 
-Each channel contains a matrix consisting of 256 elements\. The index of the matrix represents the shadow level\, and the value represents the number of occurrence of that level\.
+Each channel contains 256 entries. The index is the shade level, and the value is the number of pixels with that shade.
 
-## type PixInfo
+<a name="PixInfo"></a>
 
-PixInfo holds the color \(RGBA\) and it's number of occurrences\.
+## type [PixInfo](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfo.go#L12-L18>)
+
+PixInfo holds an RGBA color and its number of occurrences.
 
 ```go
 type PixInfo struct {
-    R     int `json:"r"`
-    G     int `json:"g"`
-    B     int `json:"b"`
-    A     int `json:"a"`
-    Count int `json:"count"`
+    R     int `json:"r"`     // R is the red channel value
+    G     int `json:"g"`     // G is the green channel value
+    B     int `json:"b"`     // B is the blue channel value
+    A     int `json:"a"`     // A is the alpha channel value
+    Count int `json:"count"` // Count is the number of occurrences
 }
 ```
 
-### func \(PixInfo\) GetKey
+<a name="PixInfo.GetKey"></a>
+
+### func \(PixInfo\) [GetKey](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfo.go#L25>)
 
 ```go
 func (p PixInfo) GetKey() string
 ```
 
-GetKey returns the RGBA values in RRRGGGBBBAAA format string for ID key\.
+GetKey returns the RGBA values as an RRRGGGBBBAAA key string.
 
 <details><summary>Example</summary>
 <p>
@@ -308,22 +362,24 @@ GetKey returns the RGBA values in RRRGGGBBBAAA format string for ID key\.
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
+ "fmt"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pixInfo := pallet.PixInfo{
-		R: 12, // Red   --> 012
-		G: 34, // Green --> 034
-		B: 56, // Blue  --> 056
-		A: 0,  // Alpha --> 000
-	}
+ pixInfo := pallet.PixInfo{
+  R:     12, // Red   --> 012
+  G:     34, // Green --> 034
+  B:     56, // Blue  --> 056
+  A:     0,  // Alpha --> 000
+  Count: 0,  // Not used
+ }
 
-	key := pixInfo.GetKey()
+ key := pixInfo.GetKey()
 
-	// Note that each RGBA values are filled with zero
-	fmt.Println(key)
+ // Print the RGBA values in RRRGGGBBBAAA format. Note that each RGBA values are filled with zero
+ fmt.Println(key)
 
 }
 ```
@@ -337,29 +393,35 @@ func main() {
 </p>
 </details>
 
-### func \(PixInfo\) MarshalJSON
+<a name="PixInfo.MarshalJSON"></a>
+
+### func \(PixInfo\) [MarshalJSON](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfo.go#L30>)
 
 ```go
 func (p PixInfo) MarshalJSON() ([]byte, error)
 ```
 
-MarshalJSON is an implementation of Marshaler which returns the elements in a single line\.
+MarshalJSON implements json.Marshaler and returns a single\-line object.
 
-## type PixInfoList
+<a name="PixInfoList"></a>
 
-PixInfoList is a slice of PixInfo which is sortable\.
+## type [PixInfoList](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L10>)
+
+PixInfoList is a sortable slice of PixInfo.
 
 ```go
 type PixInfoList []PixInfo
 ```
 
-### func ByOccurrence
+<a name="ByOccurrence"></a>
+
+### func [ByOccurrence](<https://github.com/KEINOS/go-pallet/blob/main/pallet/pallet.go#L76>)
 
 ```go
 func ByOccurrence(imgRGBA *image.RGBA) PixInfoList
 ```
 
-ByOccurrence returns PixInfoList which is a slice of PixInfo sorted by occurrence of color\.
+ByOccurrence returns the image colors sorted by occurrence.
 
 <details><summary>Example</summary>
 <p>
@@ -368,23 +430,24 @@ ByOccurrence returns PixInfoList which is a slice of PixInfo sorted by occurrenc
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
-	"log"
+ "fmt"
+ "log"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pathFile := "../testdata/gopher.png"
+ const pathFile = "../testdata/gopher.png"
 
-	imgRGBA, err := pallet.Load(pathFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+ imgRGBA, err := pallet.Load(pathFile)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	pixInfoList := pallet.ByOccurrence(imgRGBA)
+ pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-	// Print the first 2 most used colors
-	fmt.Println(pixInfoList[0:2])
+ // Print the first 2 most used colors
+ fmt.Println(pixInfoList[0:2])
 
 }
 ```
@@ -398,13 +461,15 @@ func main() {
 </p>
 </details>
 
-### func \(PixInfoList\) InJSON
+<a name="PixInfoList.InJSON"></a>
+
+### func \(PixInfoList\) [InJSON](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L27>)
 
 ```go
 func (p PixInfoList) InJSON(perLine bool) (string, error)
 ```
 
-InJSON returns a JSON formatted string of the color map\. If perLine is true then it will output each element per line\.
+InJSON returns a JSON formatted string of the color map. If perLine is true, each element is written on its own line.
 
 <details><summary>Example (Element_per_line)</summary>
 <p>
@@ -413,32 +478,33 @@ InJSON returns a JSON formatted string of the color map\. If perLine is true the
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
-	"log"
+ "fmt"
+ "log"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pathFileImg := "../testdata/r1g2b4a2.png"
+ const pathFileImg = "../testdata/r1g2b4a2.png"
 
-	// Load image
-	imgRGBA, err := pallet.Load(pathFileImg)
-	if err != nil {
-		log.Fatal(err)
-	}
+ // Load image
+ imgRGBA, err := pallet.Load(pathFileImg)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// Count by occurrence
-	pixInfoList := pallet.ByOccurrence(imgRGBA)
+ // Count by occurrence
+ pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-	// Print in JSON (each element per line)
-	outputPerLine := true
+ // Print in JSON (each element per line)
+ outputPerLine := true
 
-	result, err := pixInfoList.InJSON(outputPerLine)
-	if err != nil {
-		log.Fatal(err)
-	}
+ result, err := pixInfoList.InJSON(outputPerLine)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	fmt.Println(result)
+ fmt.Println(result)
 
 }
 ```
@@ -465,40 +531,41 @@ func main() {
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
-	"log"
+ "fmt"
+ "log"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pathFileImg := "../testdata/r1g2b4a2.png"
+ const pathFileImg = "../testdata/r1g2b4a2.png"
 
-	// Load image
-	imgRGBA, err := pallet.Load(pathFileImg)
-	if err != nil {
-		log.Fatal(err)
-	}
+ // Load image
+ imgRGBA, err := pallet.Load(pathFileImg)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// Count by occurrence
-	pixInfoList := pallet.ByOccurrence(imgRGBA)
+ // Count by occurrence
+ pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-	// Print in JSON as a single line
-	outputPerLine := false
+ // Print in JSON as a single line
+ outputPerLine := false
 
-	result, err := pixInfoList.InJSON(outputPerLine)
-	if err != nil {
-		log.Fatal(err)
-	}
+ result, err := pixInfoList.InJSON(outputPerLine)
+ if err != nil {
+  log.Fatal(err)
+ }
 
-	// Print-out in fixed width
-	width := 70
-	for i, r := range result {
-		if i%width == 0 {
-			fmt.Println()
-		}
+ // Print-out in fixed width
+ width := 70
+ for i, r := range result {
+  if i%width == 0 {
+   fmt.Println()
+  }
 
-		fmt.Print(string(r))
-	}
+  fmt.Print(string(r))
+ }
 
 }
 ```
@@ -514,37 +581,45 @@ func main() {
 </p>
 </details>
 
-### func \(PixInfoList\) Len
+<a name="PixInfoList.Len"></a>
+
+### func \(PixInfoList\) [Len](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L17>)
 
 ```go
 func (p PixInfoList) Len() int
 ```
 
-Len is an implementation of Len\(\) for sort function\. Which returns the current object's slice length\.
+Len implements sort.Interface.
 
-### func \(PixInfoList\) Less
+<a name="PixInfoList.Less"></a>
+
+### func \(PixInfoList\) [Less](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L20>)
 
 ```go
 func (p PixInfoList) Less(i, j int) bool
 ```
 
-Less is an implementation of Less\(\) for sort function\. Which returns true if the current value of Count in "i" is less than "j"\.
+Less implements sort.Interface.
 
-### func \(PixInfoList\) Swap
+<a name="PixInfoList.Swap"></a>
+
+### func \(PixInfoList\) [Swap](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L23>)
 
 ```go
 func (p PixInfoList) Swap(i, j int)
 ```
 
-Swap is an implementation of Swap\(\) for sort function\. It will swap the elements between "i" and "j"\.
+Swap implements sort.Interface.
 
-## type PixKey
+<a name="PixKey"></a>
 
-PixKey is a string type for RRRGGGBBBAAA formatted string\.
+## type [PixKey](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L15>)
 
-RRRGGGBBBAAA formatted string is the key of the map during count of the occurrence of colors in an image\.
+PixKey is a string in RRRGGGBBBAAA format.
 
-See: ColorToString\(\) at \./pallet\.go as well\.
+This format is used as the map key when counting color occurrences in an image.
+
+See also ColorToString.
 
 ```go
 type PixKey string
@@ -557,17 +632,18 @@ type PixKey string
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
+ "fmt"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pix := pallet.PixKey("123456789255")
+ pix := pallet.PixKey("123456789255")
 
-	fmt.Println("Red:", pix.GetRed())
-	fmt.Println("Green:", pix.GetGreen())
-	fmt.Println("Blue:", pix.GetBlue())
-	fmt.Println("Alpha:", pix.GetAlpha())
+ fmt.Println("Red:", pix.GetRed())
+ fmt.Println("Green:", pix.GetGreen())
+ fmt.Println("Blue:", pix.GetBlue())
+ fmt.Println("Alpha:", pix.GetAlpha())
 
 }
 ```
@@ -591,20 +667,21 @@ Alpha: 255
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
+ "fmt"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	r := pallet.PixKey("123456789255").GetRed()
-	g := pallet.PixKey("123456789255").GetGreen()
-	b := pallet.PixKey("123456789255").GetBlue()
-	a := pallet.PixKey("123456789255").GetAlpha()
+ r := pallet.PixKey("123456789255").GetRed()
+ g := pallet.PixKey("123456789255").GetGreen()
+ b := pallet.PixKey("123456789255").GetBlue()
+ a := pallet.PixKey("123456789255").GetAlpha()
 
-	fmt.Println("Red:", r)
-	fmt.Println("Green:", g)
-	fmt.Println("Blue:", b)
-	fmt.Println("Alpha:", a)
+ fmt.Println("Red:", r)
+ fmt.Println("Green:", g)
+ fmt.Println("Blue:", b)
+ fmt.Println("Alpha:", a)
 
 }
 ```
@@ -621,61 +698,71 @@ Alpha: 255
 </p>
 </details>
 
-### func \(PixKey\) GetAlpha
+<a name="PixKey.GetAlpha"></a>
+
+### func \(PixKey\) [GetAlpha](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L24>)
 
 ```go
 func (k PixKey) GetAlpha() int
 ```
 
-GetAlpha returns the alpha value from the RRRGGGBBBAAA format key string\.
+GetAlpha returns the alpha value from the RRRGGGBBBAAA format key string.
 
 ```
 a := GetAlpha("255255255100") // --> 100
 ```
 
-### func \(PixKey\) GetBlue
+<a name="PixKey.GetBlue"></a>
+
+### func \(PixKey\) [GetBlue](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L33>)
 
 ```go
 func (k PixKey) GetBlue() int
 ```
 
-GetBlue returns the blue value from the RRRGGGBBBAAA format key string\.
+GetBlue returns the blue value from the RRRGGGBBBAAA format key string.
 
 ```
 a := GetBlue("255255100255") // --> 100
 ```
 
-### func \(PixKey\) GetGreen
+<a name="PixKey.GetGreen"></a>
+
+### func \(PixKey\) [GetGreen](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L42>)
 
 ```go
 func (k PixKey) GetGreen() int
 ```
 
-GetGreen returns the green value from the RRRGGGBBBAAA format key string\.
+GetGreen returns the green value from the RRRGGGBBBAAA format key string.
 
 ```
 a := GetGreen("255100255255") // --> 100
 ```
 
-### func \(PixKey\) GetRed
+<a name="PixKey.GetRed"></a>
+
+### func \(PixKey\) [GetRed](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L51>)
 
 ```go
 func (k PixKey) GetRed() int
 ```
 
-GetRed returns the red value from the RRRGGGBBBAAA format key string\.
+GetRed returns the red value from the RRRGGGBBBAAA format key string.
 
 ```
 a := GetRed("100255255255") // --> 100
 ```
 
-### func \(PixKey\) NewPixInfo
+<a name="PixKey.NewPixInfo"></a>
+
+### func \(PixKey\) [NewPixInfo](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixKey.go#L58>)
 
 ```go
 func (k PixKey) NewPixInfo(count int) PixInfo
 ```
 
-NewPixInfo creates PixInfo object from PixKey\.
+NewPixInfo creates a PixInfo from the key and count.
 
 <details><summary>Example</summary>
 <p>
@@ -684,18 +771,19 @@ NewPixInfo creates PixInfo object from PixKey\.
 package main
 
 import (
-	"fmt"
-	"github.com/KEINOS/go-pallet/pallet"
+ "fmt"
+
+ "github.com/KEINOS/go-pallet/pallet"
 )
 
 func main() {
-	pixKey := pallet.PixKey("123456789255")
+ pixKey := pallet.PixKey("123456789255")
 
-	// Create new PixInfo object from pixKey
-	count := 0
-	pixInfo := pixKey.NewPixInfo(count)
+ // Create new PixInfo object from pixKey
+ count := 0
+ pixInfo := pixKey.NewPixInfo(count)
 
-	fmt.Println(pixInfo)
+ fmt.Println(pixInfo)
 }
 ```
 
@@ -707,7 +795,5 @@ func main() {
 
 </p>
 </details>
-
-
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)

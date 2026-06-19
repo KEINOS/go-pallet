@@ -22,8 +22,8 @@ type argT struct {
 
 	PathFileImg  string `cli:"f,file"    usage:"file path of an image to analyze"`
 	AsHistogram  bool   `cli:"histogram" usage:"print the histogram of the given image in JSON"`
-	PrintPerLine bool   `cli:"p,perline" usage:"prints each JSON elements per line"`
-	ShowVersion  bool   `cli:"v,version" usage:"displays app version"`
+	PrintPerLine bool   `cli:"p,perline" usage:"print each JSON element on its own line"`
+	ShowVersion  bool   `cli:"v,version" usage:"print the app version"`
 }
 
 func main() {
@@ -31,13 +31,13 @@ func main() {
 		new(argT),
 		PreRun,
 		color.Bold(util.GetNameBin()),
-		"  Simply print-outs the number of colors used or the histogram of an image in JSON.\n",
+		"  Print the colors used in an image, or print its histogram as JSON.\n",
 		color.Bold("Usage:"),
 		fmt.Sprintf("  %s [options] <file path>", util.GetNameBin()),
 	))
 }
 
-// PreRun allots function according to the flag options.
+// PreRun selects the action for the given flags.
 func PreRun(ctx *cli.Context) error {
 	argv, _ := ctx.Argv().(*argT)
 	args := ctx.Args()
@@ -73,8 +73,7 @@ func PreRun(ctx *cli.Context) error {
 	return nil
 }
 
-// Run is the actual function of the app. It will print the color combination
-// used or the histogram of an image.
+// Run returns either the color list or the histogram of an image.
 func Run(pathFile string, asHistogram bool, printPerLine bool) (string, error) {
 	imgRGBA, err := pallet.Load(pathFile)
 	if err != nil {
@@ -96,9 +95,9 @@ func Run(pathFile string, asHistogram bool, printPerLine bool) (string, error) {
 
 // GetVersion returns the app version to display.
 //
-// It will use the `version` and `commit` value set during build.
-// Though, this function works with "go install" which fetches the git tagged
-// version if set.
+// It uses the `version` and `commit` values set during build.
+// It also works with `go install`, which uses the Git tag version when it is
+// available.
 func GetVersion() string {
 	nameBin := util.GetNameBin()
 	verBin := "(unknown)"

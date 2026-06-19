@@ -94,7 +94,6 @@ func Save(filename string, img image.Image, encoder Encoder) error {
 }
 
 // imageDecoder decodes an image stream and reports its detected format.
-
 type imageDecoder func(io.Reader) (image.Image, string, error)
 
 func decodeAndClose(

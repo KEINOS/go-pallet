@@ -4,7 +4,7 @@
 
 # go-pallet<sub><sup><sup>beta</sup></sup></sub>
 
-The `go-pallet` package is a Go library that simply gets the number of colors used in an image. For color pallet and/or histogram-base usage.
+The `go-pallet` package is a Go library for analyzing the colors used in an image. You can use it to get a color list or a histogram.
 
 ## Library Usage
 
@@ -16,8 +16,8 @@ go get "github.com/KEINOS/go-pallet"
 
 ```go
 /*
-  This sample yields a color palette with RGBA color combinations
-  and their number of occurrences as values.
+  This example returns a color list with RGBA values
+  and their occurrence counts.
 */
 
 // import "github.com/KEINOS/go-pallet/pallet"
@@ -32,9 +32,9 @@ if err != nil {
 // Returned data are sorted in order of frequency of use.
 pixInfoList := pallet.ByOccurrence(imgRGBA)
 
-// Print the first 2 most used colors. Which is:
-//   46618 pixcels of RGBA(0,0,0,0) and
-//   32505 pixcels of RGBA(208,182,152,255)
+// Print the two most common colors:
+//   46618 pixels of RGBA(0,0,0,0) and
+//   32505 pixels of RGBA(208,182,152,255)
 fmt.Println(pixInfoList[0:2])
 
 // Output:
@@ -43,9 +43,9 @@ fmt.Println(pixInfoList[0:2])
 
 ```go
 /*
-  This sample yields a histogram of an image which is a color palette
-  with each channel's shade level (0-255) as a key and their number
-  of occurrences as values.
+  This example returns an image histogram.
+  Each channel uses shade levels (0-255) as indexes,
+  and each value is the number of pixels at that level.
 */
 
 // import "github.com/KEINOS/go-pallet/pallet"
@@ -78,7 +78,7 @@ fmt.Printf("a[0]=%v, a[255]=%v\n", hist.A[0], hist.A[255])
 
 ## Command Usage
 
-Here's a [simple implementation](./cmd/main.go) of `go-pallet` as a CLI app.
+The repository also includes a [simple CLI implementation](./cmd/main.go).
 
 ## Install
 
@@ -103,17 +103,17 @@ go install "github.com/KEINOS/go-pallet/cmd/pallet@latest"
 ```shellsession
 $ pallet -h
 pallet
-  Simply print-outs the number of colors used or the histogram of an image in JSON.
+  Print the colors used in an image, or print its histogram as JSON.
 
 Usage:
-  main [options] <file path>
+  pallet [options] <file path>
 
 Options:
 
   -f, --file        file path of an image to analyze
       --histogram   print the histogram of the given image in JSON
-  -p, --perline     prints each JSON elements per line
-  -v, --version     displays app version
+  -p, --perline     print each JSON element on its own line
+  -v, --version     print the app version
   -h, --help        display help information
 ```
 
@@ -134,7 +134,7 @@ $ pallet /path/to/image/sample.png --perline
 
 ## Statuses
 
-This template adopts the below security measures to start with.
+This project uses the following status checks.
 
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/KEINOS/go-pallet)](https://github.com/KEINOS/go-pallet/actions/workflows/go-versions.yml "Supported versions")
 [![golangci-lint](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml/badge.svg)](https://github.com/KEINOS/go-pallet/actions/workflows/golangci-lint.yml "Static Analysis")
