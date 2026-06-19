@@ -318,4 +318,43 @@ func TestPixInfoList_InJSON(t *testing.T) {
 		_, err := pixInfoList.InJSON(outputPerLine)
 		require.Error(t, err)
 	}
+
+	// Fail on JSON Lines output
+	{
+		_, err := pixInfoList.InJSONL()
+		require.Error(t, err)
+	}
+}
+
+func TestPixInfoList_InJSONL(t *testing.T) {
+	t.Parallel()
+
+	pixInfoList := pallet.PixInfoList{
+		{R: 255, G: 0, B: 0, A: 255, Count: 2},
+		{R: 0, G: 0, B: 255, A: 255, Count: 1},
+	}
+
+	actual, err := pixInfoList.InJSONL()
+
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		"{\"r\":255,\"g\":0,\"b\":0,\"a\":255,\"count\":2}\n"+
+			"{\"r\":0,\"g\":0,\"b\":255,\"a\":255,\"count\":1}\n",
+		actual,
+	)
+
+	actual, err = (pallet.PixInfoList{}).InJSONL()
+
+	require.NoError(t, err)
+	assert.Empty(t, actual)
+}
+
+func TestPixInfoList_InJSON_empty(t *testing.T) {
+	t.Parallel()
+
+	actual, err := (pallet.PixInfoList{}).InJSON(true)
+
+	require.NoError(t, err)
+	assert.Equal(t, "[\n]", actual)
 }

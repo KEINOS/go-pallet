@@ -22,6 +22,7 @@ type argT struct {
 
 	PathFileImg  string `cli:"f,file"    usage:"file path of an image to analyze"`
 	AsHistogram  bool   `cli:"histogram" usage:"print the histogram of the given image in JSON"`
+	PrintJSONL   bool   `cli:"jsonl"     usage:"print each color as a JSON object on its own line"`
 	PrintPerLine bool   `cli:"p,perline" usage:"print each JSON element on its own line"`
 	ShowVersion  bool   `cli:"v,version" usage:"print the app version"`
 }
@@ -49,6 +50,14 @@ func PreRun(ctx *cli.Context) error {
 		return nil
 	}
 
+	if argv.PrintJSONL && argv.PrintPerLine {
+		return errors.New("--jsonl and --perline cannot be used together")
+	}
+
+	if argv.PrintJSONL && argv.AsHistogram {
+		return errors.New("--jsonl and --histogram cannot be used together")
+	}
+
 	// Get target file path
 	pathFileImg := argv.PathFileImg
 
@@ -62,19 +71,25 @@ func PreRun(ctx *cli.Context) error {
 	}
 
 	// Run
-	result, err := Run(pathFileImg, argv.AsHistogram, argv.PrintPerLine)
+	result, err := Run(pathFileImg, argv.AsHistogram, argv.PrintPerLine, argv.PrintJSONL)
 	if err != nil {
 		return err
 	}
 
 	// Print results
+	if argv.PrintJSONL {
+		_ = ctx.String("%v", result)
+
+		return nil
+	}
+
 	_ = ctx.String("%v\n", result)
 
 	return nil
 }
 
 // Run returns either the color list or the histogram of an image.
-func Run(pathFile string, asHistogram bool, printPerLine bool) (string, error) {
+func Run(pathFile string, asHistogram bool, printPerLine bool, printJSONL bool) (string, error) {
 	imgRGBA, err := pallet.Load(pathFile)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to load image")
@@ -87,8 +102,15 @@ func Run(pathFile string, asHistogram bool, printPerLine bool) (string, error) {
 		return result, errors.Wrap(err, "failed to format the histogram pallet to JSON (main.Run())")
 	}
 
-	pl := pallet.ByOccurrence(imgRGBA)
-	result, err := pl.InJSON(printPerLine)
+	pixInfoList := pallet.ByOccurrence(imgRGBA)
+
+	if printJSONL {
+		result, err := pixInfoList.InJSONL()
+
+		return result, errors.Wrap(err, "failed to format the occurrence pallet to JSON Lines (main.Run())")
+	}
+
+	result, err := pixInfoList.InJSON(printPerLine)
 
 	return result, errors.Wrap(err, "failed to format the occurrence pallet to JSON (main.Run())")
 }

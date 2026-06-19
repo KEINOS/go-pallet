@@ -113,6 +113,7 @@ Options:
 
   -f, --file        file path of an image to analyze
       --histogram   print the histogram of the given image in JSON
+      --jsonl       print each color as a JSON object on its own line
   -p, --perline     print each JSON element on its own line
   -v, --version     print the app version
   -h, --help        display help information
@@ -129,7 +130,15 @@ $ pallet /path/to/image/sample.png --perline
 {"r":0,"g":255,"b":0,"a":255,"count":1},
 {"r":255,"g":0,"b":0,"a":255,"count":1}
 ]
+
+$ pallet /path/to/image/sample.png --jsonl
+{"r":0,"g":0,"b":0,"a":0,"count":1}
+{"r":0,"g":0,"b":255,"a":255,"count":1}
+{"r":0,"g":255,"b":0,"a":255,"count":1}
+{"r":255,"g":0,"b":0,"a":255,"count":1}
 ```
+
+The `--jsonl` option cannot be combined with `--perline` or `--histogram`.
 
 ---
 

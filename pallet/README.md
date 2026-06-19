@@ -34,6 +34,7 @@ For the CLI application, see ../cmd/main.go.
 - [type PixInfoList](<#PixInfoList>)
   - [func ByOccurrence\(imgRGBA \*image.RGBA\) PixInfoList](<#ByOccurrence>)
   - [func \(p PixInfoList\) InJSON\(perLine bool\) \(string, error\)](<#PixInfoList.InJSON>)
+  - [func \(p PixInfoList\) InJSONL\(\) \(string, error\)](<#PixInfoList.InJSONL>)
   - [func \(p PixInfoList\) Len\(\) int](<#PixInfoList.Len>)
   - [func \(p PixInfoList\) Less\(i, j int\) bool](<#PixInfoList.Less>)
   - [func \(p PixInfoList\) Swap\(i, j int\)](<#PixInfoList.Swap>)
@@ -580,6 +581,16 @@ func main() {
 
 </p>
 </details>
+
+<a name="PixInfoList.InJSONL"></a>
+
+### func \(PixInfoList\) [InJSONL](<https://github.com/KEINOS/go-pallet/blob/main/pallet/PixInfoList.go#L36>)
+
+```go
+func (p PixInfoList) InJSONL() (string, error)
+```
+
+InJSONL returns the color map as JSON Lines, ending each record with a newline.
 
 <a name="PixInfoList.Len"></a>
 

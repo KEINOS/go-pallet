@@ -11,7 +11,10 @@ import (
 	"github.com/zenizh/go-capturer"
 )
 
-const pathPNGImgR2G2B4A2 = "../../testdata/r1g2b4a2.png"
+const (
+	optionJSONL        = "--jsonl"
+	pathPNGImgR2G2B4A2 = "../../testdata/r1g2b4a2.png"
+)
 
 func Test_main(t *testing.T) {
 	// Backup and defer recovery
@@ -69,6 +72,73 @@ func Test_main(t *testing.T) {
 
 		assert.Equal(t, expect, actual, "it should print each element per line")
 	}
+}
+
+func Test_main_jsonl(t *testing.T) {
+	oldOsArgs := os.Args
+	oldOsExit := util.OsExit
+
+	defer func() {
+		os.Args = oldOsArgs
+		util.OsExit = oldOsExit
+	}()
+
+	var capturedCode int
+
+	util.OsExit = func(code int) {
+		capturedCode = code
+	}
+
+	out := capturer.CaptureOutput(func() {
+		os.Args = []string{t.Name(), pathPNGImgR2G2B4A2, optionJSONL}
+
+		main()
+	})
+
+	assert.Equal(t, 0, capturedCode, "status code should be zero on success")
+
+	expect := "{\"r\":0,\"g\":0,\"b\":0,\"a\":0,\"count\":12}\n" +
+		"{\"r\":255,\"g\":255,\"b\":255,\"a\":255,\"count\":6}\n" +
+		"{\"r\":0,\"g\":0,\"b\":255,\"a\":255,\"count\":4}\n" +
+		"{\"r\":0,\"g\":255,\"b\":0,\"a\":255,\"count\":2}\n" +
+		"{\"r\":255,\"g\":0,\"b\":0,\"a\":255,\"count\":1}\n"
+	actual := out
+
+	assert.Equal(t, expect, actual, "it should print one JSON object per line")
+}
+
+func Test_main_jsonl_incompatible_options(t *testing.T) {
+	oldOsArgs := os.Args
+	oldOsExit := util.OsExit
+
+	defer func() {
+		os.Args = oldOsArgs
+		util.OsExit = oldOsExit
+	}()
+
+	var capturedCode int
+
+	util.OsExit = func(code int) {
+		capturedCode = code
+	}
+
+	out := capturer.CaptureStderr(func() {
+		os.Args = []string{t.Name(), pathPNGImgR2G2B4A2, optionJSONL, "--perline"}
+
+		main()
+	})
+
+	require.Equal(t, 1, capturedCode, "exit status should be 1 for incompatible options")
+	assert.Contains(t, out, "--jsonl and --perline cannot be used together")
+
+	out = capturer.CaptureStderr(func() {
+		os.Args = []string{t.Name(), pathPNGImgR2G2B4A2, optionJSONL, "--histogram"}
+
+		main()
+	})
+
+	require.Equal(t, 1, capturedCode, "exit status should be 1 for incompatible options")
+	assert.Contains(t, out, "--jsonl and --histogram cannot be used together")
 }
 
 func Test_main_as_histogram_default(t *testing.T) {
