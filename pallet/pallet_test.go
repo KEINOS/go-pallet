@@ -92,6 +92,40 @@ func TestAsHistogram(t *testing.T) {
 	}
 }
 
+func TestRGBAHelpers(t *testing.T) {
+	t.Parallel()
+
+	assert.Equal(t, 255, pallet.Uint32ToInt(0xffff))
+	assert.Equal(t, "012034056078", pallet.ColorToString(
+		color.RGBA{R: 12, G: 34, B: 56, A: 78},
+	))
+}
+
+func TestPixelAnalysis_subimage(t *testing.T) {
+	t.Parallel()
+
+	parent := image.NewRGBA(image.Rect(0, 0, 4, 4))
+	subimage, ok := parent.SubImage(image.Rect(1, 1, 3, 3)).(*image.RGBA)
+	require.True(t, ok)
+
+	red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	blue := color.RGBA{R: 0, G: 0, B: 255, A: 255}
+
+	subimage.SetRGBA(1, 1, red)
+	subimage.SetRGBA(2, 1, red)
+	subimage.SetRGBA(1, 2, red)
+	subimage.SetRGBA(2, 2, blue)
+
+	histogram := pallet.AsHistogram(subimage)
+	assert.Equal(t, 3, histogram.R[255])
+	assert.Equal(t, 1, histogram.B[255])
+
+	occurrences := pallet.ByOccurrence(subimage)
+	require.Len(t, occurrences, 2)
+	assert.Equal(t, pallet.PixInfo{R: 255, G: 0, B: 0, A: 255, Count: 3}, occurrences[0])
+	assert.Equal(t, pallet.PixInfo{R: 0, G: 0, B: 255, A: 255, Count: 1}, occurrences[1])
+}
+
 func TestAsHistogram_InJSON_defalt(t *testing.T) {
 	t.Parallel()
 

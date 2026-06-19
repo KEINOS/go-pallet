@@ -53,6 +53,28 @@ func TestDiff_non_zero_origin(t *testing.T) {
 	assert.Equal(t, color.RGBA{R: 5, G: 10, B: 20, A: 5}, imgDiff.RGBAAt(10, 20))
 }
 
+func TestDiff_subimages(t *testing.T) {
+	t.Parallel()
+
+	firstParent := image.NewRGBA(image.Rect(0, 0, 4, 4))
+	secondParent := image.NewRGBA(image.Rect(0, 0, 4, 4))
+	bounds := image.Rect(1, 1, 3, 3)
+	first, firstOK := firstParent.SubImage(bounds).(*image.RGBA)
+	require.True(t, firstOK)
+
+	second, secondOK := secondParent.SubImage(bounds).(*image.RGBA)
+	require.True(t, secondOK)
+
+	first.SetRGBA(2, 2, color.RGBA{R: 10, G: 20, B: 30, A: 40})
+	second.SetRGBA(2, 2, color.RGBA{R: 15, G: 10, B: 50, A: 35})
+
+	actual, err := pallet.Diff(first, second)
+
+	require.NoError(t, err)
+	assert.Equal(t, bounds, actual.Bounds())
+	assert.Equal(t, color.RGBA{R: 5, G: 10, B: 20, A: 5}, actual.RGBAAt(2, 2))
+}
+
 func TestDiff_change_each_rgb(t *testing.T) {
 	t.Parallel()
 

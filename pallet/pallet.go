@@ -2,7 +2,6 @@ package pallet
 
 import (
 	"encoding/json"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -20,6 +19,13 @@ const (
 	MaxUint8 = 256
 	// MaxInt32 is the maximum value of signed 32-bit integer.
 	MaxInt32 = 2147483647
+
+	rgbaChannelShift = 8
+	redKeyShift      = 24
+	greenKeyShift    = 16
+	blueKeyShift     = 8
+	rgbaChannelMask  = 0xff
+	decimalDigits    = "0123456789"
 )
 
 // ----------------------------------------------------------------------------
@@ -43,9 +49,7 @@ var (
 
 // Uint32ToInt converts a uint32 channel value to an 8-bit int.
 func Uint32ToInt(u uint32) int {
-	i := int(u)
-
-	return i / MaxUint8
+	return int(u >> rgbaChannelShift)
 }
 
 // AsHistogram returns the per-channel histogram of an image.
@@ -55,17 +59,17 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 
 	// Create new histogram
 	hist := NewHistogram()
+	rowBytes := bounds.Dx() * rgbaBytesPerPixel
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			//nolint:varnamelen // Allow short variable name for readability
-			r, g, b, a := imgRGBA.At(x, y).RGBA()
+		offset := imgRGBA.PixOffset(bounds.Min.X, y)
+		row := imgRGBA.Pix[offset : offset+rowBytes]
 
-			// Count up the corresponding shade strength of each channel
-			hist.R[Uint32ToInt(r)]++
-			hist.G[Uint32ToInt(g)]++
-			hist.B[Uint32ToInt(b)]++
-			hist.A[Uint32ToInt(a)]++
+		for index := 0; index < len(row); index += rgbaBytesPerPixel {
+			hist.R[row[index]]++
+			hist.G[row[index+1]]++
+			hist.B[row[index+2]]++
+			hist.A[row[index+3]]++
 		}
 	}
 
@@ -80,12 +84,18 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 	pixelCount := bounds.Dx() * bounds.Dy()
 
 	// Count the number of times each color appears.
-	pixmap := make(map[string]int, pixelCount)
+	pixmap := make(map[uint32]int, pixelCount)
+	rowBytes := bounds.Dx() * rgbaBytesPerPixel
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			key := ColorToString(imgRGBA.At(x, y))
+		offset := imgRGBA.PixOffset(bounds.Min.X, y)
+		row := imgRGBA.Pix[offset : offset+rowBytes]
 
+		for index := 0; index < len(row); index += rgbaBytesPerPixel {
+			key := uint32(row[index])<<redKeyShift |
+				uint32(row[index+1])<<greenKeyShift |
+				uint32(row[index+2])<<blueKeyShift |
+				uint32(row[index+3])
 			pixmap[key]++
 		}
 	}
@@ -93,12 +103,18 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 	// Convert the map into PixInfoList.
 	pixList := make(PixInfoList, len(pixmap))
 
-	i := 0
+	listIndex := 0
 
 	for key, count := range pixmap {
-		pixList[i] = PixKey(key).NewPixInfo(count)
+		pixList[listIndex] = PixInfo{
+			R:     int(key >> redKeyShift),
+			G:     int(key>>greenKeyShift) & rgbaChannelMask,
+			B:     int(key>>blueKeyShift) & rgbaChannelMask,
+			A:     int(key) & rgbaChannelMask,
+			Count: count,
+		}
 
-		i++
+		listIndex++
 	}
 
 	// Sort by descending occurrence, then by ascending color key so ties are
@@ -111,7 +127,19 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 			return first.Count > second.Count
 		}
 
-		return first.GetKey() < second.GetKey()
+		if first.R != second.R {
+			return first.R < second.R
+		}
+
+		if first.G != second.G {
+			return first.G < second.G
+		}
+
+		if first.B != second.B {
+			return first.B < second.B
+		}
+
+		return first.A < second.A
 	})
 
 	return pixList
@@ -120,10 +148,21 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 // ColorToString returns a color value in RRRGGGBBBAAA format.
 // It is mainly used as a map key.
 func ColorToString(c color.Color) string {
-	r, g, b, a := c.RGBA()
+	red, green, blue, alpha := c.RGBA()
+	key := [12]byte{}
 
-	return fmt.Sprintf("%03v%03v%03v%03v",
-		Uint32ToInt(r), Uint32ToInt(g), Uint32ToInt(b), Uint32ToInt(a))
+	putThreeDigits(key[0:3], Uint32ToInt(red))
+	putThreeDigits(key[3:6], Uint32ToInt(green))
+	putThreeDigits(key[6:9], Uint32ToInt(blue))
+	putThreeDigits(key[9:12], Uint32ToInt(alpha))
+
+	return string(key[:])
+}
+
+func putThreeDigits(dst []byte, value int) {
+	dst[0] = decimalDigits[value/100]
+	dst[1] = decimalDigits[value/10%10]
+	dst[2] = decimalDigits[value%10]
 }
 
 // Load reads an image file and returns it as image.RGBA.

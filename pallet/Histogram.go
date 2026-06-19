@@ -23,14 +23,16 @@ type Histogram struct {
 // NewHistogram returns an initialized Histogram.
 func NewHistogram() *Histogram {
 	shadesMax := 256 // each channel has 256 shade levels (0-255)
+	channelCount := 4
+	shades := make([]int, shadesMax*channelCount)
 
 	// Each channel has 256 entries. The index is the shade level, and the value
 	// is the number of pixels with that shade.
 	return &Histogram{
-		R: make([]int, shadesMax),
-		G: make([]int, shadesMax),
-		B: make([]int, shadesMax),
-		A: make([]int, shadesMax),
+		R: shades[:shadesMax:shadesMax],
+		G: shades[shadesMax : shadesMax*2 : shadesMax*2],
+		B: shades[shadesMax*2 : shadesMax*3 : shadesMax*3],
+		A: shades[shadesMax*3 : shadesMax*4 : shadesMax*4],
 	}
 }
 
