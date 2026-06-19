@@ -3,7 +3,8 @@ version: "2"
 linters:
     default: all
     disable:
-        # Deprecated in v2; replaced by wsl_v5.
+        # Deprecated linters
         - wsl
+        - gomodguard
         # Allow to use external dependencies.
         - depguard
