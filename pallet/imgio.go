@@ -1,8 +1,11 @@
 package pallet
 
 /*
-The coeds here were originally taken from github.com/anthonynsimon/bild/imgio.
-Which holds the same MIT license as the Go-Pallet has.
+The code here were originally taken from github.com/anthonynsimon/bild/imgio
+with the below license. The code has been modified to fit the needs of this
+project.
+
+---
 
 MIT License
 
@@ -43,12 +46,6 @@ import (
 type Encoder func(io.Writer, image.Image) error
 
 // Open loads and decodes an image from a file and returns it.
-//
-// Usage example:
-//
-//	// Decodes an image from a file with the given filename
-//	// returns an error if something went wrong
-//	img, err := Open("exampleName")
 func Open(filename string) (image.Image, error) {
 	safeFilename := filepath.Clean(filename)
 
@@ -57,18 +54,7 @@ func Open(filename string) (image.Image, error) {
 		return nil, errors.Wrap(err, "no such file or directory")
 	}
 
-	img, _, err := image.Decode(ptrFile)
-	closeErr := ptrFile.Close()
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode image file")
-	}
-
-	if closeErr != nil {
-		return nil, errors.Wrap(closeErr, "failed to close image file")
-	}
-
-	return img, nil
+	return decodeAndClose(ptrFile, image.Decode)
 }
 
 // JPEGEncoder returns an encoder to JPEG given the argument 'quality'.
@@ -96,14 +82,7 @@ func BMPEncoder() Encoder {
 }
 
 // Save creates a file and writes to it an image using the provided encoder.
-//
-// Usage example:
-//
-//	// Save an image to a file in PNG format,
-//	// returns an error if something went wrong
-//	err := Save("exampleName", img, imgio.JPEGEncoder(100))
 func Save(filename string, img image.Image, encoder Encoder) error {
-	// filename = strings.TrimSuffix(filename, filepath.Ext(filename))
 	safeFilename := filepath.Clean(filename)
 
 	ptrFile, err := os.Create(safeFilename)
@@ -111,6 +90,36 @@ func Save(filename string, img image.Image, encoder Encoder) error {
 		return errors.Wrap(err, "failed to create file to save")
 	}
 
+	return encodeAndClose(ptrFile, img, encoder)
+}
+
+/* Helpers */
+
+type imageDecoder func(io.Reader) (image.Image, string, error)
+
+func decodeAndClose(
+	ptrFile io.ReadCloser,
+	decoder imageDecoder,
+) (image.Image, error) {
+	img, _, err := decoder(ptrFile)
+	closeErr := ptrFile.Close()
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode image file")
+	}
+
+	if closeErr != nil {
+		return nil, errors.Wrap(closeErr, "failed to close image file")
+	}
+
+	return img, nil
+}
+
+func encodeAndClose(
+	ptrFile io.WriteCloser,
+	img image.Image,
+	encoder Encoder,
+) error {
 	encodeErr := encoder(ptrFile, img)
 	closeErr := ptrFile.Close()
 

@@ -1,29 +1,118 @@
-package pallet_test
+package pallet
 
 import (
 	"bytes"
+	"fmt"
 	"image"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
-	"github.com/KEINOS/go-pallet/pallet"
 	"github.com/KEINOS/go-utiles/util"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+var (
+	errCloseFailed  = errors.New("close failed")
+	errEncodeFailed = errors.New("encode failed")
+)
+
+type readCloserStub struct {
+	reader   io.Reader
+	closeErr error
+}
+
+func (r readCloserStub) Read(p []byte) (int, error) {
+	n, err := r.reader.Read(p)
+	if err != nil {
+		return n, fmt.Errorf("read from stub: %w", err)
+	}
+
+	return n, nil
+}
+
+func (r readCloserStub) Close() error {
+	return r.closeErr
+}
+
+type writeCloserStub struct {
+	closeErr error
+}
+
+func (w writeCloserStub) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+func (w writeCloserStub) Close() error {
+	return w.closeErr
+}
+
+func TestDecodeAndClose_close_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	actual, err := decodeAndClose(
+		readCloserStub{reader: strings.NewReader("ignored"), closeErr: errCloseFailed},
+		func(_ io.Reader) (image.Image, string, error) {
+			return mockImg, "png", nil
+		},
+	)
+
+	require.Error(t, err)
+	assert.Nil(t, actual)
+	assert.Contains(t, err.Error(), "failed to close image file")
+}
+
+func TestEncodeAndClose_encode_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	err := encodeAndClose(
+		writeCloserStub{closeErr: nil},
+		mockImg,
+		func(_ io.Writer, _ image.Image) error {
+			return errEncodeFailed
+		},
+	)
+
+	require.Error(t, err)
+	assert.ErrorIs(t, err, errEncodeFailed)
+}
+
+func TestEncodeAndClose_close_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	err := encodeAndClose(
+		writeCloserStub{closeErr: errCloseFailed},
+		mockImg,
+		func(_ io.Writer, _ image.Image) error {
+			return nil
+		},
+	)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to close image file")
+}
 
 func TestEncode(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
 		value   image.Image
-		encoder pallet.Encoder
+		encoder Encoder
 		format  string
 	}{
 		{
 			format:  "png",
-			encoder: pallet.PNGEncoder(),
+			encoder: PNGEncoder(),
 			value: &image.RGBA{
 				Rect:   image.Rect(0, 0, 3, 3),
 				Stride: 3 * 4,
@@ -36,7 +125,7 @@ func TestEncode(t *testing.T) {
 		},
 		{
 			format:  "jpg,jpeg",
-			encoder: pallet.JPEGEncoder(95),
+			encoder: JPEGEncoder(95),
 			value: &image.RGBA{
 				Rect:   image.Rect(0, 0, 3, 3),
 				Stride: 3 * 4,
@@ -49,7 +138,7 @@ func TestEncode(t *testing.T) {
 		},
 		{
 			format:  "bmp",
-			encoder: pallet.BMPEncoder(),
+			encoder: BMPEncoder(),
 			value: &image.RGBA{
 				Rect:   image.Rect(0, 0, 3, 3),
 				Stride: 3 * 4,
@@ -85,7 +174,7 @@ func TestOpen_fail(t *testing.T) {
 	{
 		pathDirUnknown := filepath.Join(pathDirTmp, "unknown_dir")
 
-		_, err := pallet.Open(pathDirUnknown)
+		_, err := Open(pathDirUnknown)
 
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "no such file or directory")
@@ -97,7 +186,7 @@ func TestOpen_fail(t *testing.T) {
 		err := os.WriteFile(pathFileTmp, []byte("foo bar"), 0o600)
 		require.NoError(t, err)
 
-		_, err = pallet.Open(pathFileTmp)
+		_, err = Open(pathFileTmp)
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to decode image file")
 	}
@@ -107,7 +196,7 @@ func TestOpen_saved_image(t *testing.T) {
 	t.Parallel()
 
 	// Create image
-	encPNG := pallet.PNGEncoder()
+	encPNG := PNGEncoder()
 	imgRAW := &image.RGBA{
 		Rect:   image.Rect(0, 0, 3, 3),
 		Stride: 3 * 4,
@@ -124,7 +213,7 @@ func TestOpen_saved_image(t *testing.T) {
 
 	pathFileTmp := filepath.Join(pathDirTmp, "temp.png")
 
-	err := pallet.Save(pathFileTmp, imgRAW, encPNG)
+	err := Save(pathFileTmp, imgRAW, encPNG)
 	require.NoError(t, err)
 
 	// Assert
@@ -146,7 +235,7 @@ func TestOpen_saved_image(t *testing.T) {
 
 	// Open - reopen file and compare to origin
 	expectImg := imgRAW
-	actualImg, err := pallet.Open(pathFileTmp)
+	actualImg, err := Open(pathFileTmp)
 	require.NoError(t, err)
 
 	assert.EqualValues(t, expectImg, actualImg)
@@ -156,7 +245,7 @@ func TestSave_fail_save(t *testing.T) {
 	t.Parallel()
 
 	// Create image
-	encPNG := pallet.PNGEncoder()
+	encPNG := PNGEncoder()
 	imgRAW := &image.RGBA{
 		Rect:   image.Rect(0, 0, 3, 3),
 		Stride: 3 * 4,
@@ -171,7 +260,7 @@ func TestSave_fail_save(t *testing.T) {
 	pathDirTmp, cleanup := util.GetTempDir()
 	defer cleanup()
 
-	err := pallet.Save(pathDirTmp, imgRAW, encPNG)
+	err := Save(pathDirTmp, imgRAW, encPNG)
 
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create file to save",
