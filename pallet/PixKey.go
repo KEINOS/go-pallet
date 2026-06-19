@@ -6,12 +6,12 @@ import "strconv"
 //  Type: PixKey
 // ----------------------------------------------------------------------------
 
-// PixKey is a string type for RRRGGGBBBAAA formatted string.
+// PixKey is a string in RRRGGGBBBAAA format.
 //
-// RRRGGGBBBAAA formatted string is the key of the map during count of the occurrence
-// of colors in an image.
+// This format is used as the map key when counting color occurrences in an
+// image.
 //
-// See: ColorToString() at ./pallet.go as well.
+// See also ColorToString.
 type PixKey string
 
 // ----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ func (k PixKey) GetRed() int {
 	return i
 }
 
-// NewPixInfo creates PixInfo object from PixKey.
+// NewPixInfo creates a PixInfo from the key and count.
 func (k PixKey) NewPixInfo(count int) PixInfo {
 	return PixInfo{
 		R:     k.GetRed(),

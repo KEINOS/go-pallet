@@ -45,19 +45,19 @@ import (
 // Encoder encodes the provided image and writes it.
 type Encoder func(io.Writer, image.Image) error
 
-// Open loads and decodes an image from a file and returns it.
+// Open loads and decodes an image from a file.
 func Open(filename string) (image.Image, error) {
-	safeFilename := filepath.Clean(filename)
+	cleanPath := filepath.Clean(filename)
 
-	ptrFile, err := os.Open(safeFilename)
+	file, err := os.Open(cleanPath)
 	if err != nil {
 		return nil, errors.Wrap(err, "no such file or directory")
 	}
 
-	return decodeAndClose(ptrFile, image.Decode)
+	return decodeAndClose(file, image.Decode)
 }
 
-// JPEGEncoder returns an encoder to JPEG given the argument 'quality'.
+// JPEGEncoder returns an encoder that writes JPEG output.
 func JPEGEncoder(quality int) Encoder {
 	return func(w io.Writer, img image.Image) error {
 		return errors.Wrap(jpeg.Encode(w, img, &jpeg.Options{Quality: quality}),
@@ -65,7 +65,7 @@ func JPEGEncoder(quality int) Encoder {
 	}
 }
 
-// PNGEncoder returns an encoder to PNG.
+// PNGEncoder returns an encoder that writes PNG output.
 func PNGEncoder() Encoder {
 	return func(w io.Writer, img image.Image) error {
 		return errors.Wrap(png.Encode(w, img),
@@ -73,7 +73,7 @@ func PNGEncoder() Encoder {
 	}
 }
 
-// BMPEncoder returns an encoder to BMP.
+// BMPEncoder returns an encoder that writes BMP output.
 func BMPEncoder() Encoder {
 	return func(w io.Writer, img image.Image) error {
 		return errors.Wrap(bmp.Encode(w, img),
@@ -81,28 +81,28 @@ func BMPEncoder() Encoder {
 	}
 }
 
-// Save creates a file and writes to it an image using the provided encoder.
+// Save creates a file and writes the image using the provided encoder.
 func Save(filename string, img image.Image, encoder Encoder) error {
-	safeFilename := filepath.Clean(filename)
+	cleanPath := filepath.Clean(filename)
 
-	ptrFile, err := os.Create(safeFilename)
+	file, err := os.Create(cleanPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to create file to save")
 	}
 
-	return encodeAndClose(ptrFile, img, encoder)
+	return encodeAndClose(file, img, encoder)
 }
 
-/* Helpers */
+// imageDecoder decodes an image stream and reports its detected format.
 
 type imageDecoder func(io.Reader) (image.Image, string, error)
 
 func decodeAndClose(
-	ptrFile io.ReadCloser,
+	file io.ReadCloser,
 	decoder imageDecoder,
 ) (image.Image, error) {
-	img, _, err := decoder(ptrFile)
-	closeErr := ptrFile.Close()
+	img, _, err := decoder(file)
+	closeErr := file.Close()
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode image file")
@@ -116,12 +116,12 @@ func decodeAndClose(
 }
 
 func encodeAndClose(
-	ptrFile io.WriteCloser,
+	file io.WriteCloser,
 	img image.Image,
 	encoder Encoder,
 ) error {
-	encodeErr := encoder(ptrFile, img)
-	closeErr := ptrFile.Close()
+	encodeErr := encoder(file, img)
+	closeErr := file.Close()
 
 	if encodeErr != nil {
 		return encodeErr

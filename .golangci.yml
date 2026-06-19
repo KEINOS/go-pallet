@@ -6,5 +6,6 @@ linters:
         # Deprecated linters
         - wsl
         - gomodguard
-        # Allow to use external dependencies.
+        # Allowed by project policy
+        - testpackage
         - depguard

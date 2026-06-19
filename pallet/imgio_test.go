@@ -51,57 +51,6 @@ func (w writeCloserStub) Close() error {
 	return w.closeErr
 }
 
-func TestDecodeAndClose_close_error(t *testing.T) {
-	t.Parallel()
-
-	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
-
-	actual, err := decodeAndClose(
-		readCloserStub{reader: strings.NewReader("ignored"), closeErr: errCloseFailed},
-		func(_ io.Reader) (image.Image, string, error) {
-			return mockImg, "png", nil
-		},
-	)
-
-	require.Error(t, err)
-	assert.Nil(t, actual)
-	assert.Contains(t, err.Error(), "failed to close image file")
-}
-
-func TestEncodeAndClose_encode_error(t *testing.T) {
-	t.Parallel()
-
-	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
-
-	err := encodeAndClose(
-		writeCloserStub{closeErr: nil},
-		mockImg,
-		func(_ io.Writer, _ image.Image) error {
-			return errEncodeFailed
-		},
-	)
-
-	require.Error(t, err)
-	assert.ErrorIs(t, err, errEncodeFailed)
-}
-
-func TestEncodeAndClose_close_error(t *testing.T) {
-	t.Parallel()
-
-	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
-
-	err := encodeAndClose(
-		writeCloserStub{closeErr: errCloseFailed},
-		mockImg,
-		func(_ io.Writer, _ image.Image) error {
-			return nil
-		},
-	)
-
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to close image file")
-}
-
 func TestEncode(t *testing.T) {
 	t.Parallel()
 
@@ -265,4 +214,55 @@ func TestSave_fail_save(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to create file to save",
 		"it should contain the error reason")
+}
+
+func TestDecodeAndClose_close_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	actual, err := decodeAndClose(
+		readCloserStub{reader: strings.NewReader("ignored"), closeErr: errCloseFailed},
+		func(_ io.Reader) (image.Image, string, error) {
+			return mockImg, "png", nil
+		},
+	)
+
+	require.Error(t, err)
+	assert.Nil(t, actual)
+	assert.Contains(t, err.Error(), "failed to close image file")
+}
+
+func TestEncodeAndClose_encode_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	err := encodeAndClose(
+		writeCloserStub{closeErr: nil},
+		mockImg,
+		func(_ io.Writer, _ image.Image) error {
+			return errEncodeFailed
+		},
+	)
+
+	require.Error(t, err)
+	assert.ErrorIs(t, err, errEncodeFailed)
+}
+
+func TestEncodeAndClose_close_error(t *testing.T) {
+	t.Parallel()
+
+	mockImg := image.NewRGBA(image.Rect(0, 0, 1, 1))
+
+	err := encodeAndClose(
+		writeCloserStub{closeErr: errCloseFailed},
+		mockImg,
+		func(_ io.Writer, _ image.Image) error {
+			return nil
+		},
+	)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to close image file")
 }

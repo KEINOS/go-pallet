@@ -28,12 +28,12 @@ const (
 
 //nolint:gochecknoglobals // Allow to ease mock during test.
 var (
-	// JSONMarshal is a copy of json.Marshal() to ease mock during test.
-	// Temporary replace the function to mock its behavior.
+	// JSONMarshal is a copy of json.Marshal to ease mocking during tests.
+	// Replace it temporarily when a test needs to force an error path.
 	JSONMarshal = json.Marshal
 
-	// JSONMarshalIndent is a copy of json.MarshalIndent() to ease mock during test.
-	// Temporary replace the function to mock its behavior.
+	// JSONMarshalIndent is a copy of json.MarshalIndent to ease mocking during
+	// tests. Replace it temporarily when a test needs to force an error path.
 	JSONMarshalIndent = json.MarshalIndent
 )
 
@@ -41,14 +41,14 @@ var (
 //  Functions
 // ----------------------------------------------------------------------------
 
-// Uint32ToInt converts uint32 to int in the range of 0 to MaxUint8 (0-255).
+// Uint32ToInt converts a uint32 channel value to an 8-bit int.
 func Uint32ToInt(u uint32) int {
 	i := int(u)
 
 	return i / MaxUint8
 }
 
-// AsHistogram returns a Histogram object from an image.
+// AsHistogram returns the per-channel histogram of an image.
 func AsHistogram(imgRGBA *image.RGBA) Histogram {
 	// Get sizes
 	bounds := imgRGBA.Bounds()
@@ -72,7 +72,7 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 	return *hist
 }
 
-// ByOccurrence returns PixInfoList which is a slice of PixInfo sorted by occurrence of color.
+// ByOccurrence returns the image colors sorted by occurrence.
 func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 	// Get sizes
 	bounds := imgRGBA.Bounds()
@@ -94,8 +94,8 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 
 	i := 0
 
-	for k, v := range pixmap {
-		pixList[i] = PixKey(k).NewPixInfo(v)
+	for key, count := range pixmap {
+		pixList[i] = PixKey(key).NewPixInfo(count)
 
 		i++
 	}
@@ -106,8 +106,8 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 	return pixList
 }
 
-// ColorToString returns color.RGBA object's RGBA value as a RRRGGGBBBAAA formatted string.
-// Mostly used for the key of a map.
+// ColorToString returns a color value in RRRGGGBBBAAA format.
+// It is mainly used as a map key.
 func ColorToString(c color.Color) string {
 	r, g, b, a := c.RGBA()
 
@@ -115,7 +115,7 @@ func ColorToString(c color.Color) string {
 		Uint32ToInt(r), Uint32ToInt(g), Uint32ToInt(b), Uint32ToInt(a))
 }
 
-// Load returns the image.RGBA object pointer read image from pathFileImg.
+// Load reads an image file and returns it as image.RGBA.
 func Load(pathFileImg string) (*image.RGBA, error) {
 	img, err := Open(pathFileImg)
 	if err != nil {
