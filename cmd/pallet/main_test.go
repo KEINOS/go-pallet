@@ -11,7 +11,7 @@ import (
 	"github.com/zenizh/go-capturer"
 )
 
-const pathPNGImgR2G2B4A2 = "../testdata/r1g2b4a2.png"
+const pathPNGImgR2G2B4A2 = "../../testdata/r1g2b4a2.png"
 
 func Test_main(t *testing.T) {
 	// Backup and defer recovery
@@ -206,7 +206,7 @@ func Test_main_show_version(t *testing.T) {
 	})
 
 	require.Equal(t, 0, capturedCode, "exit status should be zero on version display")
-	assert.Contains(t, out, "cmd.test")
+	assert.Contains(t, out, "pallet.test")
 	assert.Contains(t, out, "(devel)")
 }
 
@@ -228,6 +228,6 @@ func TestGetVersion(t *testing.T) {
 	actual := GetVersion()
 
 	// Assert
-	assert.Contains(t, actual, "cmd.test")
+	assert.Contains(t, actual, "pallet.test")
 	assert.Contains(t, actual, "1.2.3 (abc)")
 }
