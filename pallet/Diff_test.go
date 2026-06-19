@@ -24,6 +24,35 @@ func TestDiff_size_unmatch(t *testing.T) {
 	assert.Nil(t, imgDiff, "on error the returned pointer should be a nil")
 }
 
+func TestDiff_bounds_unmatch(t *testing.T) {
+	t.Parallel()
+
+	img1 := image.NewRGBA(image.Rect(0, 0, 3, 3))
+	img2 := image.NewRGBA(image.Rect(1, 1, 4, 4))
+
+	imgDiff, err := pallet.Diff(img1, img2)
+
+	require.Error(t, err, "it should return an error if two images do not have the same bounds")
+	assert.Nil(t, imgDiff, "on error the returned pointer should be nil")
+}
+
+func TestDiff_non_zero_origin(t *testing.T) {
+	t.Parallel()
+
+	bounds := image.Rect(10, 20, 11, 21)
+	img1 := image.NewRGBA(bounds)
+	img2 := image.NewRGBA(bounds)
+
+	img1.SetRGBA(10, 20, color.RGBA{R: 10, G: 20, B: 30, A: 40})
+	img2.SetRGBA(10, 20, color.RGBA{R: 15, G: 10, B: 50, A: 35})
+
+	imgDiff, err := pallet.Diff(img1, img2)
+
+	require.NoError(t, err)
+	assert.Equal(t, bounds, imgDiff.Bounds())
+	assert.Equal(t, color.RGBA{R: 5, G: 10, B: 20, A: 5}, imgDiff.RGBAAt(10, 20))
+}
+
 func TestDiff_change_each_rgb(t *testing.T) {
 	t.Parallel()
 

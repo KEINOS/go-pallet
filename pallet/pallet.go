@@ -72,7 +72,8 @@ func AsHistogram(imgRGBA *image.RGBA) Histogram {
 	return *hist
 }
 
-// ByOccurrence returns the image colors sorted by occurrence.
+// ByOccurrence returns the image colors sorted by descending occurrence.
+// Colors with equal counts are sorted by ascending RGBA key.
 func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 	// Get image bounds and estimate the maximum number of unique pixels.
 	bounds := imgRGBA.Bounds()
@@ -100,8 +101,18 @@ func ByOccurrence(imgRGBA *image.RGBA) PixInfoList {
 		i++
 	}
 
-	// Sort PixInfos by occurrence
-	sort.Stable(sort.Reverse(pixList))
+	// Sort by descending occurrence, then by ascending color key so ties are
+	// deterministic instead of inheriting randomized map iteration order.
+	sort.Slice(pixList, func(firstIndex, secondIndex int) bool {
+		first := pixList[firstIndex]
+		second := pixList[secondIndex]
+
+		if first.Count != second.Count {
+			return first.Count > second.Count
+		}
+
+		return first.GetKey() < second.GetKey()
+	})
 
 	return pixList
 }

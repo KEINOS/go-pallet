@@ -1,6 +1,8 @@
 package pallet_test
 
 import (
+	"image"
+	"image/color"
 	"testing"
 
 	"github.com/KEINOS/go-pallet/pallet"
@@ -8,6 +10,51 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestByOccurrence_ties_are_deterministic(t *testing.T) {
+	t.Parallel()
+
+	imgRGBA := image.NewRGBA(image.Rect(0, 0, 2, 2))
+	imgRGBA.SetRGBA(0, 0, color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	imgRGBA.SetRGBA(1, 0, color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	imgRGBA.SetRGBA(0, 1, color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	imgRGBA.SetRGBA(1, 1, color.RGBA{R: 0, G: 0, B: 0, A: 255})
+
+	expectedKeys := []string{
+		"000000000255",
+		"000000255255",
+		"000255000255",
+		"255000000255",
+	}
+
+	for range 100 {
+		pixInfoList := pallet.ByOccurrence(imgRGBA)
+		actualKeys := make([]string, len(pixInfoList))
+
+		for index, pixInfo := range pixInfoList {
+			actualKeys[index] = pixInfo.GetKey()
+		}
+
+		require.Equal(t, expectedKeys, actualKeys)
+	}
+}
+
+func TestPixInfoList_sort_interface(t *testing.T) {
+	t.Parallel()
+
+	pixInfoList := pallet.PixInfoList{
+		{R: 0, G: 0, B: 0, A: 255, Count: 1},
+		{R: 255, G: 255, B: 255, A: 255, Count: 2},
+	}
+
+	assert.Equal(t, 2, pixInfoList.Len())
+	assert.True(t, pixInfoList.Less(0, 1))
+
+	pixInfoList.Swap(0, 1)
+
+	assert.Equal(t, 2, pixInfoList[0].Count)
+	assert.Equal(t, 1, pixInfoList[1].Count)
+}
 
 func TestAsHistogram(t *testing.T) {
 	t.Parallel()
