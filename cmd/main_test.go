@@ -11,6 +11,8 @@ import (
 	"github.com/zenizh/go-capturer"
 )
 
+const pathPNGImgR2G2B4A2 = "../testdata/r1g2b4a2.png"
+
 func Test_main(t *testing.T) {
 	// Backup and defer recovery
 	oldOsArgs := os.Args
@@ -29,7 +31,7 @@ func Test_main(t *testing.T) {
 
 	{
 		out := capturer.CaptureOutput(func() {
-			os.Args = []string{t.Name(), "../testdata/r1g2b4a2.png"}
+			os.Args = []string{t.Name(), pathPNGImgR2G2B4A2}
 
 			main()
 		})
@@ -49,7 +51,7 @@ func Test_main(t *testing.T) {
 
 	{
 		out := capturer.CaptureOutput(func() {
-			os.Args = []string{t.Name(), "-f", "../testdata/r1g2b4a2.png", "--perline"}
+			os.Args = []string{t.Name(), "-f", pathPNGImgR2G2B4A2, "--perline"}
 
 			main()
 		})
@@ -85,7 +87,7 @@ func Test_main_as_histogram_default(t *testing.T) {
 		capturedCode = code
 	}
 	out := capturer.CaptureOutput(func() {
-		os.Args = []string{t.Name(), "--histogram", "../testdata/r1g2b4a2.png"}
+		os.Args = []string{t.Name(), "--histogram", pathPNGImgR2G2B4A2}
 
 		main()
 	})
