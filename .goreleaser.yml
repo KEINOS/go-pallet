@@ -97,9 +97,6 @@ homebrew_casks:
       name: homebrew-apps
     # Target directory: KEINOS/homebrew-apps/Casks
     directory: Casks
-    # Verify that release assets are hosted by this repository.
-    url:
-      verified: github.com/KEINOS/go-pallet
     # Author info to commit to the tap repo
     commit_author:
       name: goreleaserbot
@@ -110,9 +107,11 @@ homebrew_casks:
     binaries:
       - pallet
     # Remove macOS quarantine metadata from the unsigned binary.
-    hooks:
-      post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/pallet"]
-          end
+    # ponytail: keep one custom block until GoReleaser supports install_steps.
+    # Escape the Homebrew token so GoReleaser passes it through unchanged.
+    custom_block: |
+      postflight_steps do
+        on_macos do
+          run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ "{{staged_path}}" }}/pallet"]
+        end
+      end
