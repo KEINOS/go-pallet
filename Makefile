@@ -32,7 +32,7 @@ bench:
 check: test lint
 
 update:
-	go get -u ./...
+	go get -u=patch ./...
 	go mod tidy
 
 clean:
